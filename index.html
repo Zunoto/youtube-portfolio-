@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real Aaquif | Official Creator Portfolio</title>
+  <meta name="description"
+    content="Official portfolio website for Minecraft YouTuber Real Aaquif. Explore achievements, browse latest feed updates, and get in touch.">
+  <link rel="icon" type="image/png" href="assets/pfp.png">
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+  <!-- Custom Cursor Glow Spotlight -->
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <!-- Admin Mode Header Banner (Appears when logged in) -->
+  <div class="admin-mode-banner" id="adminBanner">
+    <span><i class="fa-solid fa-user-gear"></i> CREATOR PORTAL ACTIVE (ADMIN MODE)</span>
+    <button class="exit-admin-btn" id="exitAdminBtn">EXIT PORTAL</button>
+  </div>
+
+  <!-- Background Overlays -->
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-light-shafts"></div>
+
+  <!-- Top Header Nav -->
+  <header class="header-nav">
+    <a href="#home" class="logo">
+      <i class="fa-solid fa-cube"></i> REAL <span>AAQUIF</span>
+    </a>
+    <nav class="top-nav-links">
+      <a href="#home" class="nav-link active">INTRO</a>
+      <a href="#about" class="nav-link">ABOUT</a>
+      <a href="#achievements" class="nav-link">STATS</a>
+      <a href="#spoilers" class="nav-link">SPOILERS</a>
+      <a href="#updates" class="nav-link">FEED</a>
+      <a href="#contact" class="nav-link">CONNECT</a>
+    </nav>
+  </header>
+
+  <!-- Main Scroll Container -->
+  <main>
+
+    <!-- SECTION 1: HERO / HOME -->
+    <section id="home">
+      <div class="hero-content">
+        <div class="hero-tag">OFFICIAL YOUTUBE PORTAL</div>
+        <h1 class="hero-title">
+          <span>CREATING BEYOND</span>
+          <span class="accent">THE BLOCKS</span>
+        </h1>
+        <p class="hero-description">
+          Building immersive redstone mechanisms, survival stories, and high-fidelity Minecraft experiences. Join me as
+          we shape new adventures and push the boundaries of digital gameplay.
+        </p>
+        <div class="hero-cta">
+          <a href="#updates" class="btn-primary">
+            EXPLORE FEED <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <a href="#contact" class="btn-secondary">CONNECT</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="visual-glow"></div>
+        <!-- 3D Rotating Glass Block -->
+        <div class="cube-viewport">
+          <div class="cube-3d" id="interactiveCube">
+            <div class="cube-face face-front"></div>
+            <div class="cube-face face-back"></div>
+            <div class="cube-face face-left"></div>
+            <div class="cube-face face-right"></div>
+            <div class="cube-face face-top"></div>
+            <div class="cube-face face-bottom"></div>
+            <div class="cube-core"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-indicator" onclick="document.getElementById('about').scrollIntoView();">
+        <span>SCROLL TO DISCOVER</span>
+        <div class="mouse-icon">
+          <span class="scroll-wheel"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: ABOUT / ORIGIN -->
+    <section id="about">
+      <h2 class="section-title">THE <span>ORIGIN</span></h2>
+      <div class="about-container">
+        <div class="about-pfp-wrapper">
+          <div class="about-pfp-glow"></div>
+          <div class="about-pfp-card glass-panel" id="creatorPfpCard" title="Double click to access Creator Portal">
+            <img src="assets/pfp.png" alt="Real Aaquif Profile Picture" class="about-pfp-img">
+          </div>
+        </div>
+        <div class="about-text">
+          <div class="about-subtitle">CREATOR PORTRAIT // REAL AAQUIF</div>
+          <p class="about-description">
+            Hey! I'm Aaquif, also known online as <strong>Real Aaquif</strong>. I make entertaining, high-energy
+            Minecraft content ranging from redstone logic tutorials to extreme survival challenges and custom map
+            building.
+          </p>
+          <p class="about-description">
+            My content focuses on combining technical gameplay with engaging storytelling. By building an open community
+            and interactive projects, I seek to inspire other players to unleash their blocky creativity and code their
+            dreams inside Minecraft.
+          </p>
+          <div class="about-highlights">
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fa-solid fa-clapperboard"></i></div>
+              <div class="highlight-label">
+                Content Creator
+                <span>YouTube Partner</span>
+              </div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fa-solid fa-code"></i></div>
+              <div class="highlight-label">
+                Redstone Architect
+                <span>Logic Specialist</span>
+              </div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fa-solid fa-users"></i></div>
+              <div class="highlight-label">
+                Community Host
+                <span>Discord Organizer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: ACHIEVEMENTS / STATS -->
+    <section id="achievements">
+      <h2 class="section-title">MILESTONES & <span>STATS</span></h2>
+      <div class="stats-grid">
+        <!-- STAT CARD 1: SUBSCRIBERS -->
+        <div class="stat-card glass-panel">
+          <div class="stat-icon"><i class="fa-brands fa-youtube"></i></div>
+          <div class="stat-number" data-target="11700" data-suffix="+">0</div>
+          <div class="stat-label">Subscribers</div>
+          <div class="stat-desc">Exact YouTube Community</div>
+          <div class="stat-sparkline">
+            <div class="spark-bar" style="height: 25%"></div>
+            <div class="spark-bar" style="height: 35%"></div>
+            <div class="spark-bar" style="height: 50%"></div>
+            <div class="spark-bar" style="height: 45%"></div>
+            <div class="spark-bar" style="height: 60%"></div>
+            <div class="spark-bar" style="height: 75%"></div>
+            <div class="spark-bar" style="height: 95%"></div>
+          </div>
+        </div>
+
+        <!-- STAT CARD 2: VIEWS -->
+        <div class="stat-card glass-panel">
+          <div class="stat-icon"><i class="fa-solid fa-eye"></i></div>
+          <div class="stat-number" data-target="700000" data-suffix="+">0</div>
+          <div class="stat-label">Total Views</div>
+          <div class="stat-desc">Lifetime views of all uploads</div>
+          <div class="stat-sparkline">
+            <div class="spark-bar" style="height: 15%"></div>
+            <div class="spark-bar" style="height: 30%"></div>
+            <div class="spark-bar" style="height: 40%"></div>
+            <div class="spark-bar" style="height: 55%"></div>
+            <div class="spark-bar" style="height: 65%"></div>
+            <div class="spark-bar" style="height: 80%"></div>
+            <div class="spark-bar" style="height: 100%"></div>
+          </div>
+        </div>
+
+        <!-- STAT CARD 3: VIDEOS -->
+        <div class="stat-card glass-panel">
+          <div class="stat-icon"><i class="fa-solid fa-video"></i></div>
+          <div class="stat-number" data-target="79" data-suffix="">0</div>
+          <div class="stat-label">Uploads</div>
+          <div class="stat-desc">Videos, tutorials & guides</div>
+          <div class="stat-sparkline">
+            <div class="spark-bar" style="height: 80%"></div>
+            <div class="spark-bar" style="height: 83%"></div>
+            <div class="spark-bar" style="height: 87%"></div>
+            <div class="spark-bar" style="height: 90%"></div>
+            <div class="spark-bar" style="height: 93%"></div>
+            <div class="spark-bar" style="height: 96%"></div>
+            <div class="spark-bar" style="height: 100%"></div>
+          </div>
+        </div>
+
+        <!-- STAT CARD 4: DISCORD -->
+        <div class="stat-card glass-panel">
+          <div class="stat-icon"><i class="fa-brands fa-discord"></i></div>
+          <div class="stat-number" data-target="1500" data-suffix="+">0</div>
+          <div class="stat-label">Discord Members</div>
+          <div class="stat-desc">Real SMP community guild</div>
+          <div class="stat-sparkline">
+            <div class="spark-bar" style="height: 20%"></div>
+            <div class="spark-bar" style="height: 30%"></div>
+            <div class="spark-bar" style="height: 42%"></div>
+            <div class="spark-bar" style="height: 40%"></div>
+            <div class="spark-bar" style="height: 58%"></div>
+            <div class="spark-bar" style="height: 70%"></div>
+            <div class="spark-bar" style="height: 90%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: SPOILERS & SNEAK PEEKS -->
+    <section id="spoilers">
+      <h2 class="section-title">VIDEO <span>SPOILERS</span> & NOTES</h2>
+      <div class="spoilers-container" id="spoilersContainer">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </section>
+
+    <!-- SECTION 5: UPDATES / FEED -->
+    <section id="updates">
+      <div class="feed-header">
+        <h2 class="section-title" style="margin-bottom: 0;">LATEST <span>FEED</span></h2>
+        <div class="feed-filters">
+          <button class="filter-btn active" data-filter="all">ALL</button>
+          <button class="filter-btn" data-filter="video">VIDEOS</button>
+          <button class="filter-btn" data-filter="announcement">UPDATES</button>
+          <button class="filter-btn" data-filter="media">MEDIA</button>
+          <button class="creator-portal-trigger" id="portalTriggerBtn">
+            <i class="fa-solid fa-lock"></i> CREATOR PORTAL
+          </button>
+        </div>
+      </div>
+
+      <!-- Feed Grid -->
+      <div class="feed-grid" id="feedGrid">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </section>
+
+    <!-- SECTION 5: CONTACT / CONNECT -->
+    <section id="contact">
+      <h2 class="section-title">GET IN <span>TOUCH</span></h2>
+      <div class="contact-container">
+
+        <!-- Left: Quick Contact Info & Interactive Buttons -->
+        <div class="contact-text">
+          <div class="about-subtitle">COMMUNITY & COLLABORATION</div>
+          <p class="contact-desc">
+            Have a business inquiry, an awesome server proposal, or just want to chat redstone logic? Hit me up on any
+            of the official channels below!
+          </p>
+
+          <div class="social-buttons-grid">
+            <!-- YouTube Button -->
+            <a href="https://youtube.com/@realaaquif" target="_blank" class="social-glass-btn youtube glass-panel">
+              <div class="btn-left">
+                <div class="btn-icon"><i class="fa-brands fa-youtube"></i></div>
+                <div class="btn-meta">
+                  <h4>YouTube Channel</h4>
+                  <span>Watch my latest uploads</span>
+                </div>
+              </div>
+              <div class="btn-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Discord Button -->
+            <a href="https://discord.gg/AeYDnRqpxp" target="_blank" class="social-glass-btn discord glass-panel">
+              <div class="btn-left">
+                <div class="btn-icon"><i class="fa-brands fa-discord"></i></div>
+                <div class="btn-meta">
+                  <h4>Discord Server</h4>
+                  <span>Join the community discord</span>
+                </div>
+              </div>
+              <div class="btn-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Gmail Button -->
+            <a href="mailto:realaaquifextra@gmail.com" class="social-glass-btn gmail glass-panel">
+              <div class="btn-left">
+                <div class="btn-icon"><i class="fa-solid fa-envelope"></i></div>
+                <div class="btn-meta">
+                  <h4>Gmail Account</h4>
+                  <span>Send direct business mail</span>
+                </div>
+              </div>
+              <div class="btn-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Message Form Panel -->
+        <div class="contact-form-panel glass-panel">
+          <h3>SEND A MESSAGE</h3>
+          <div class="form-status" id="formStatus"></div>
+          <form id="contactForm">
+            <div class="form-group">
+              <label for="formName">Your Name</label>
+              <input type="text" id="formName" class="form-control" placeholder="Steve Block" required>
+            </div>
+            <div class="form-group">
+              <label for="formEmail">Your Email</label>
+              <input type="email" id="formEmail" class="form-control" placeholder="steve@minecraft.net" required>
+            </div>
+            <div class="form-group">
+              <label for="formMsg">Your Message</label>
+              <textarea id="formMsg" class="form-control"
+                placeholder="Hey Aaquif, love the videos! I wanted to invite you to..." required></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+              SEND MESSAGE <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-copy">
+      &copy; 2026 Real Aaquif. Designed under channel theme.
+    </div>
+    <div class="footer-links">
+      <a href="#home" class="footer-link">Home</a>
+      <a href="#about" class="footer-link">About</a>
+      <a href="#updates" class="footer-link">Feed</a>
+      <a href="#contact" class="footer-link">Contact</a>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+     ADMIN PORTAL MODALS
+     ========================================================================== */ -->
+
+  <!-- Modal 1: Creator Login -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3>Creator Portal</h3>
+        <button class="modal-close-btn" id="closeLoginBtn">&times;</button>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginPassword">Enter Portal Access Key</label>
+          <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+          UNLOCK PORTAL <i class="fa-solid fa-key"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Creator Admin Dashboard -->
+  <div class="modal-overlay" id="adminDashboardModal">
+    <div class="modal-card glass-panel" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>Creator Dashboard</h3>
+        <button class="modal-close-btn" id="closeDashboardBtn">&times;</button>
+      </div>
+
+      <!-- Dashboard Tab Navigation -->
+      <div class="dashboard-tabs">
+        <button class="tab-btn active" data-pane="paneStats"><i class="fa-solid fa-chart-simple"></i> STATS</button>
+        <button class="tab-btn" data-pane="paneSpoiler"><i class="fa-solid fa-film"></i> SPOILERS</button>
+        <button class="tab-btn" data-pane="paneFeed"><i class="fa-solid fa-newspaper"></i> FEED POST</button>
+      </div>
+
+      <!-- Tab Panels -->
+      <!-- PANE 1: STATS -->
+      <div class="tab-pane active" id="paneStats">
+        <form id="adjustStatsForm">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+              <label for="statSubsInput">Subscribers Count</label>
+              <input type="number" id="statSubsInput" class="form-control" value="11700" required>
+            </div>
+            <div class="form-group">
+              <label for="statViewsInput">Total Views Count</label>
+              <input type="number" id="statViewsInput" class="form-control" value="700000" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+            <div class="form-group">
+              <label for="statVideosInput">Uploads Count</label>
+              <input type="number" id="statVideosInput" class="form-control" value="79" required>
+            </div>
+            <div class="form-group">
+              <label for="statDiscordInput">Discord Members Count</label>
+              <input type="number" id="statDiscordInput" class="form-control" value="1500" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 20px;">
+            SAVE METRICS <i class="fa-solid fa-floppy-disk"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- PANE 2: SPOILERS -->
+      <div class="tab-pane" id="paneSpoiler">
+        <form id="uploadSpoilerForm">
+          <div class="form-group">
+            <label for="spoilerTitle">Spoiler Title</label>
+            <input type="text" id="spoilerTitle" class="form-control" placeholder="100 Days in Hardcore Nether..."
+              required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+              <label for="spoilerDate">Release Date Info</label>
+              <input type="text" id="spoilerDate" class="form-control" placeholder="Friday, June 12" required>
+            </div>
+            <div class="form-group">
+              <label for="spoilerYoutubeUrl">YouTube Embed/Video URL (Optional)</label>
+              <input type="url" id="spoilerYoutubeUrl" class="form-control"
+                placeholder="https://youtube.com/watch?v=...">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label for="spoilerVideoFile">Upload Video snippet (Simulate local file)</label>
+            <input type="file" id="spoilerVideoFile" class="form-control" accept="video/*" style="padding: 8px;">
+          </div>
+          <div class="form-group">
+            <label for="spoilerDesc">Spoiler Description / Sneak Peek Notes</label>
+            <textarea id="spoilerDesc" class="form-control"
+              placeholder="Write a short summary of the upcoming content..." required></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 15px;">
+            PUBLISH SNEAK PEEK <i class="fa-solid fa-share-from-square"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- PANE 3: FEED POST -->
+      <div class="tab-pane" id="paneFeed">
+        <form id="createPostForm">
+          <div class="form-group">
+            <label for="postTitle">Post Title</label>
+            <input type="text" id="postTitle" class="form-control" placeholder="Minecraft Survival Episode 100!"
+              required>
+          </div>
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+              <label for="postTag">Category / Tag</label>
+              <select id="postTag" class="form-control" style="background-color: var(--bg-darkest);" required>
+                <option value="video">Video Upload</option>
+                <option value="announcement">Announcement</option>
+                <option value="milestone">Milestone Update</option>
+                <option value="media">Media / Downloads</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="postLink">Action Link URL</label>
+              <input type="url" id="postLink" class="form-control" placeholder="https://youtube.com/watch?v=...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="postImg">Thumbnail / Cover Image URL</label>
+            <input type="text" id="postImg" class="form-control"
+              placeholder="https://images.unsplash.com/photo-... or custom path">
+          </div>
+          <div class="form-group">
+            <label for="postDesc">Post Description</label>
+            <textarea id="postDesc" class="form-control" placeholder="Tell your audience what's new..."
+              required></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+            PUBLISH POST <i class="fa-solid fa-share-from-square"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+</body>
+
+</html>
