@@ -1096,15 +1096,15 @@ body.theme-gold .cube-face {
   box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
 }
 
-.social-glass-btn.gmail:hover {
-  border-color: rgba(209, 26, 42, 0.4);
-  background: rgba(209, 26, 42, 0.05);
-  box-shadow: 0 10px 30px rgba(209, 26, 42, 0.15);
+.social-glass-btn.instagram:hover {
+  border-color: rgba(225, 48, 108, 0.4);
+  background: rgba(225, 48, 108, 0.05);
+  box-shadow: 0 10px 30px rgba(225, 48, 108, 0.15);
 }
-.social-glass-btn.gmail:hover .btn-icon {
-  background: var(--color-red);
+.social-glass-btn.instagram:hover .btn-icon {
+  background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
   color: white;
-  box-shadow: 0 0 15px rgba(209, 26, 42, 0.4);
+  box-shadow: 0 0 15px rgba(225, 48, 108, 0.4);
 }
 
 .social-glass-btn:hover .btn-arrow {

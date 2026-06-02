@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     aboutDesc3: "Through my content, I aim to entertain, make people laugh, and create experiences that viewers genuinely enjoy watching and sharing with others.",
     youtubeLink: "https://youtube.com/@realaaquif",
     discordLink: "https://discord.gg/AeYDnRqpxp",
-    gmailAddress: "realaaquifextra@gmail.com",
+    instagramLink: "https://www.instagram.com/realaaquif",
     pfpUrl: "assets/pfp.png"
   };
 
@@ -100,10 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const discordBtn = document.querySelector('.social-glass-btn.discord');
     if (discordBtn) discordBtn.href = settings.discordLink;
 
-    const gmailBtn = document.querySelector('.social-glass-btn.gmail');
-    if (gmailBtn) {
-      const email = settings.gmailAddress;
-      gmailBtn.href = email.startsWith('mailto:') ? email : 'mailto:' + email;
+    const instagramBtn = document.querySelector('.social-glass-btn.instagram');
+    if (instagramBtn) {
+      instagramBtn.href = settings.instagramLink;
     }
   }
 
@@ -663,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const aboutDesc3El = document.getElementById('siteAboutDesc3');
     const youtubeUrlEl = document.getElementById('siteYoutubeUrl');
     const discordUrlEl = document.getElementById('siteDiscordUrl');
-    const gmailEl = document.getElementById('siteGmail');
+    const instagramEl = document.getElementById('siteInstagram');
 
     if (heroTitle1El) heroTitle1El.value = settings.heroTitle1 || '';
     if (heroTitle2El) heroTitle2El.value = settings.heroTitle2 || '';
@@ -674,7 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (aboutDesc3El) aboutDesc3El.value = settings.aboutDesc3 || '';
     if (youtubeUrlEl) youtubeUrlEl.value = settings.youtubeLink || '';
     if (discordUrlEl) discordUrlEl.value = settings.discordLink || '';
-    if (gmailEl) gmailEl.value = settings.gmailAddress || '';
+    if (instagramEl) instagramEl.value = settings.instagramLink || '';
   }
 
   // --- ADMIN PORTAL OPEN/CLOSE TRIGGERS ---
@@ -827,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         aboutDesc3: document.getElementById('siteAboutDesc3').value.trim(),
         youtubeLink: document.getElementById('siteYoutubeUrl').value.trim(),
         discordLink: document.getElementById('siteDiscordUrl').value.trim(),
-        gmailAddress: document.getElementById('siteGmail').value.trim(),
+        instagramLink: document.getElementById('siteInstagram').value.trim(),
         pfpUrl: document.getElementById('sitePfpUrl').value.trim()
       };
 
@@ -836,6 +835,7 @@ document.addEventListener('DOMContentLoaded', () => {
       newSettings.aboutTitle = currentSettings.aboutTitle || defaultSiteSettings.aboutTitle;
       newSettings.aboutSubtitle = currentSettings.aboutSubtitle || defaultSiteSettings.aboutSubtitle;
       newSettings.heroTag = currentSettings.heroTag || defaultSiteSettings.heroTag;
+      newSettings.instagramLink = currentSettings.instagramLink || defaultSiteSettings.instagramLink;
 
       localStorage.setItem('aaquif_site_settings', JSON.stringify(newSettings));
       applySiteSettingsToPage();
