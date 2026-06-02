@@ -26,3 +26,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 *.env
+
+# Local Databases
+database.json
+

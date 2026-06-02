@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- STATE MANAGEMENT ---
   let isAdmin = sessionStorage.getItem('aaquif_admin') === 'true';
-  const defaultPassword = 'meonika143';
+  const defaultPassword = 'Sexwithrealaaquif';
 
   // Default Stats Metrics
   const defaultStats = {
@@ -197,6 +197,67 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('aaquif_posts', JSON.stringify(posts));
   }
 
+  // Database helper functions for server synchronization
+  async function loadDataFromServer() {
+    try {
+      const response = await fetch('/api/data');
+      if (!response.ok) throw new Error("Server error");
+      const data = await response.json();
+      
+      // Update local variables
+      if (data.stats) channelStats = data.stats;
+      if (data.siteSettings) siteSettings = data.siteSettings;
+      if (data.spoilers) spoilers = data.spoilers;
+      if (data.posts) posts = data.posts;
+
+      // Sync to localStorage
+      localStorage.setItem('aaquif_stats', JSON.stringify(channelStats));
+      localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
+      localStorage.setItem('aaquif_spoilers', JSON.stringify(spoilers));
+      localStorage.setItem('aaquif_posts', JSON.stringify(posts));
+      
+      return true;
+    } catch (err) {
+      console.warn("Could not load database from backend, using localStorage cache:", err);
+      return false;
+    }
+  }
+
+  async function saveDataToServer() {
+    const password = sessionStorage.getItem('aaquif_admin_password') || '';
+    try {
+      const response = await fetch('/api/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Password': password
+        },
+        body: JSON.stringify({
+          stats: channelStats,
+          siteSettings: siteSettings,
+          spoilers: spoilers,
+          posts: posts
+        })
+      });
+      if (response.status === 401) {
+        showNotification("Session unauthorized. Re-authenticating...", "error");
+        isAdmin = false;
+        sessionStorage.removeItem('aaquif_admin');
+        sessionStorage.removeItem('aaquif_admin_password');
+        updateAdminUI();
+        adminDashboardModal.classList.remove('active');
+        loginModal.classList.add('active');
+        return false;
+      }
+      if (!response.ok) throw new Error("Failed to save to database server.");
+      return true;
+    } catch (err) {
+      console.error(err);
+      showNotification("Saved locally. (Database server offline)", "info");
+      return false;
+    }
+  }
+
   // --- DOM ELEMENTS ---
   const body = document.body;
   const interactiveCube = document.getElementById('interactiveCube');
@@ -242,11 +303,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const formStatus = document.getElementById('formStatus');
 
   // --- INITIALIZE VIEWS & UI ---
-  applySiteSettingsToPage();
-  updateAdminUI();
-  renderPosts();
-  renderSpoilers();
-  applyStatsToCards();
+  async function initApp() {
+    await loadDataFromServer();
+    applySiteSettingsToPage();
+    updateAdminUI();
+    renderPosts();
+    renderSpoilers();
+    applyStatsToCards();
+  }
+  initApp();
 
   // --- TABS CONTROL FOR DASHBOARD ---
   const tabBtns = document.querySelectorAll('.tab-btn');
@@ -506,6 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderSpoilers();
       renderAdminSpoilersList(); // Update the control panel list
       showNotification("Spoiler removed.", "info");
+      saveDataToServer();
     }
   }
 
@@ -788,13 +854,32 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Form Submit: Login
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const enteredPass = loginPassword.value.trim().toLowerCase();
+    const enteredPass = loginPassword.value.trim();
 
-    if (enteredPass === defaultPassword) {
+    // Authenticate with server if possible
+    let authSuccess = false;
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: enteredPass })
+      });
+      if (response.ok) {
+        authSuccess = true;
+      }
+    } catch (err) {
+      // Fallback to client check if server is offline
+      if (enteredPass === defaultPassword) {
+        authSuccess = true;
+      }
+    }
+
+    if (authSuccess) {
       isAdmin = true;
       sessionStorage.setItem('aaquif_admin', 'true');
+      sessionStorage.setItem('aaquif_admin_password', enteredPass);
       updateAdminUI();
       loginModal.classList.remove('active');
       loginForm.reset();
@@ -822,7 +907,8 @@ document.addEventListener('DOMContentLoaded', () => {
       discord: parseInt(document.getElementById('statDiscordInput').value)
     };
 
-    localStorage.setItem('aaquif_stats', JSON.stringify(updatedStats));
+    channelStats = updatedStats;
+    localStorage.setItem('aaquif_stats', JSON.stringify(channelStats));
     applyStatsToCards();
 
     // Trigger rollup counter redraw
@@ -832,6 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     adminDashboardModal.classList.remove('active');
     showNotification("Milestone statistics updated in real-time!", "success");
+    saveDataToServer();
   });
 
   // Form Submit 2: Alter Site Customizer
@@ -862,11 +949,13 @@ document.addEventListener('DOMContentLoaded', () => {
       newSettings.aboutSubtitle = currentSettings.aboutSubtitle || defaultSiteSettings.aboutSubtitle;
       newSettings.heroTag = currentSettings.heroTag || defaultSiteSettings.heroTag;
 
-      localStorage.setItem('aaquif_site_settings', JSON.stringify(newSettings));
+      siteSettings = newSettings;
+      localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
       applySiteSettingsToPage();
 
       adminDashboardModal.classList.remove('active');
       showNotification("Site branding updated successfully!", "success");
+      saveDataToServer();
     });
   }
 
@@ -904,6 +993,7 @@ document.addEventListener('DOMContentLoaded', () => {
     adminDashboardModal.classList.remove('active');
     uploadSpoilerForm.reset();
     showNotification("Upcoming spoiler snippet published!", "success");
+    saveDataToServer();
   });
 
   // Form Submit 4: Create Feed Post
@@ -930,6 +1020,7 @@ document.addEventListener('DOMContentLoaded', () => {
     adminDashboardModal.classList.remove('active');
     createPostForm.reset();
     showNotification("New feed update published successfully!", "success");
+    saveDataToServer();
   });
 
   // --- PUBLISH TYPE SELECTOR ---
@@ -965,6 +1056,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPosts(activeFilter);
       renderAdminFeedList(); // Refresh admin manager list
       showNotification("Update deleted.", "info");
+      saveDataToServer();
     }
   }
 
@@ -972,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
   exitAdminBtn.addEventListener('click', () => {
     isAdmin = false;
     sessionStorage.removeItem('aaquif_admin');
+    sessionStorage.removeItem('aaquif_admin_password');
     updateAdminUI();
     showNotification("Logged out from Creator Portal.", "info");
   });
@@ -981,6 +1074,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebarExitBtn.addEventListener('click', () => {
       isAdmin = false;
       sessionStorage.removeItem('aaquif_admin');
+      sessionStorage.removeItem('aaquif_admin_password');
       updateAdminUI();
       adminDashboardModal.classList.remove('active');
       showNotification("Logged out from Creator Portal.", "info");
