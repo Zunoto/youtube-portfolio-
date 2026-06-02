@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Default Site Branding Settings
   const defaultSiteSettings = {
-    settingsVersion: 2,
+    settingsVersion: 3,
     heroTag: "OFFICIAL YOUTUBE PORTAL",
     heroTitle1: "OFFICIAL WEPSITE",
-    heroTitle2: "REALA AQUIF",
+    heroTitle2: "REAL AAQUIF",
     heroDesc: "Real Aaquif is a Minecraft YouTuber known for creating entertaining PvP, challenge, and gameplay content for the Minecraft community. This is the official website of Real Aaquif, where you can find updates, content, and everything related to the channel.",
     aboutTitle: "THE ORIGIN",
     aboutSubtitle: "CREATOR PORTRAIT // REAL AAQUIF",
@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
   } else {
     // If settings version is outdated, perform migration to new defaults
-    if (!siteSettings.settingsVersion || siteSettings.settingsVersion < 2) {
-      siteSettings.settingsVersion = 2;
+    if (!siteSettings.settingsVersion || siteSettings.settingsVersion < 3) {
+      siteSettings.settingsVersion = 3;
       siteSettings.heroTitle1 = defaultSiteSettings.heroTitle1;
       siteSettings.heroTitle2 = defaultSiteSettings.heroTitle2;
       siteSettings.heroDesc = defaultSiteSettings.heroDesc;
@@ -840,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
 
       const newSettings = {
-        settingsVersion: 2,
+        settingsVersion: 3,
         heroTag: "OFFICIAL YOUTUBE PORTAL",
         heroTitle1: document.getElementById('siteHeroTitle1').value.trim(),
         heroTitle2: document.getElementById('siteHeroTitle2').value.trim(),
