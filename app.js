@@ -40,11 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
     pfpUrl: "assets/pfp.png"
   };
 
-  // Load or Save site settings to localStorage
+  // Load or Save site settings to localStorage (merging defaults to prevent undefined keys)
   let siteSettings = JSON.parse(localStorage.getItem('aaquif_site_settings'));
   if (!siteSettings) {
     siteSettings = defaultSiteSettings;
     localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
+  } else {
+    // Merge any missing keys from defaults (e.g. instagramLink, aboutDesc3)
+    let needsUpdate = false;
+    for (const key in defaultSiteSettings) {
+      if (siteSettings[key] === undefined) {
+        siteSettings[key] = defaultSiteSettings[key];
+        needsUpdate = true;
+      }
+    }
+    if (needsUpdate) {
+      localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
+    }
   }
 
   // Function to apply site branding to the homepage HTML dynamically
@@ -835,7 +847,6 @@ document.addEventListener('DOMContentLoaded', () => {
       newSettings.aboutTitle = currentSettings.aboutTitle || defaultSiteSettings.aboutTitle;
       newSettings.aboutSubtitle = currentSettings.aboutSubtitle || defaultSiteSettings.aboutSubtitle;
       newSettings.heroTag = currentSettings.heroTag || defaultSiteSettings.heroTag;
-      newSettings.instagramLink = currentSettings.instagramLink || defaultSiteSettings.instagramLink;
 
       localStorage.setItem('aaquif_site_settings', JSON.stringify(newSettings));
       applySiteSettingsToPage();
