@@ -23,6 +23,85 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('aaquif_stats', JSON.stringify(channelStats));
   }
 
+  // Default Site Branding Settings
+  const defaultSiteSettings = {
+    heroTag: "OFFICIAL YOUTUBE PORTAL",
+    heroTitle1: "CREATING BEYOND",
+    heroTitle2: "THE BLOCKS",
+    heroDesc: "Building immersive redstone mechanisms, survival stories, and high-fidelity Minecraft experiences. Join me as we shape new adventures and push the boundaries of digital gameplay.",
+    aboutTitle: "THE ORIGIN",
+    aboutSubtitle: "CREATOR PORTRAIT // REAL AAQUIF",
+    aboutDesc1: "Hey! I'm Aaquif, also known online as <strong>Real Aaquif</strong>. I make entertaining, high-energy Minecraft content ranging from redstone logic tutorials to extreme survival challenges and custom map building.",
+    aboutDesc2: "My content focuses on combining technical gameplay with engaging storytelling. By building an open community and interactive projects, I seek to inspire other players to unleash their blocky creativity and code their dreams inside Minecraft.",
+    youtubeLink: "https://youtube.com/@realaaquif",
+    discordLink: "https://discord.gg/AeYDnRqpxp",
+    gmailAddress: "realaaquifextra@gmail.com",
+    pfpUrl: "assets/pfp.png"
+  };
+
+  // Load or Save site settings to localStorage
+  let siteSettings = JSON.parse(localStorage.getItem('aaquif_site_settings'));
+  if (!siteSettings) {
+    siteSettings = defaultSiteSettings;
+    localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
+  }
+
+  // Function to apply site branding to the homepage HTML dynamically
+  function applySiteSettingsToPage() {
+    const settings = JSON.parse(localStorage.getItem('aaquif_site_settings')) || defaultSiteSettings;
+    
+    // Hero DOM elements
+    const heroTagEl = document.querySelector('.hero-tag');
+    if (heroTagEl) heroTagEl.textContent = settings.heroTag;
+
+    const heroTitle1El = document.querySelector('.hero-title span:not(.accent)');
+    if (heroTitle1El) heroTitle1El.textContent = settings.heroTitle1;
+
+    const heroTitle2El = document.querySelector('.hero-title span.accent');
+    if (heroTitle2El) heroTitle2El.textContent = settings.heroTitle2;
+
+    const heroDescEl = document.querySelector('.hero-description');
+    if (heroDescEl) heroDescEl.textContent = settings.heroDesc;
+
+    // About DOM elements
+    const aboutTitleEl = document.querySelector('#about .section-title');
+    if (aboutTitleEl) {
+      // Find the last word and wrap it in a span tag for styled red color
+      const titleWords = settings.aboutTitle.split(' ');
+      if (titleWords.length > 1) {
+        const lastWord = titleWords.pop();
+        aboutTitleEl.innerHTML = titleWords.join(' ') + ` <span>${lastWord}</span>`;
+      } else {
+        aboutTitleEl.innerHTML = `<span>${settings.aboutTitle}</span>`;
+      }
+    }
+    
+    const aboutSubtitleEl = document.querySelector('.about-subtitle');
+    if (aboutSubtitleEl) aboutSubtitleEl.textContent = settings.aboutSubtitle;
+
+    const aboutPfpEl = document.querySelector('.about-pfp-img');
+    if (aboutPfpEl) aboutPfpEl.src = settings.pfpUrl;
+
+    const aboutDescs = document.querySelectorAll('.about-description');
+    if (aboutDescs.length >= 2) {
+      aboutDescs[0].innerHTML = settings.aboutDesc1;
+      aboutDescs[1].innerHTML = settings.aboutDesc2;
+    }
+
+    // Social buttons integration
+    const youtubeBtn = document.querySelector('.social-glass-btn.youtube');
+    if (youtubeBtn) youtubeBtn.href = settings.youtubeLink;
+
+    const discordBtn = document.querySelector('.social-glass-btn.discord');
+    if (discordBtn) discordBtn.href = settings.discordLink;
+
+    const gmailBtn = document.querySelector('.social-glass-btn.gmail');
+    if (gmailBtn) {
+      const email = settings.gmailAddress;
+      gmailBtn.href = email.startsWith('mailto:') ? email : 'mailto:' + email;
+    }
+  }
+
   // Default Spoilers list
   const defaultSpoilers = [
     {
@@ -114,16 +193,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const adjustStatsForm = document.getElementById('adjustStatsForm');
   const uploadSpoilerForm = document.getElementById('uploadSpoilerForm');
   const createPostForm = document.getElementById('createPostForm');
+  const alterSiteForm = document.getElementById('alterSiteForm');
 
   // Admin Banner
   const adminBanner = document.getElementById('adminBanner');
   const exitAdminBtn = document.getElementById('exitAdminBtn');
+  const bannerOpenDashboardBtn = document.getElementById('bannerOpenDashboardBtn');
+  const sidebarExitBtn = document.getElementById('sidebarExitBtn');
+
+  // Manage lists & search inputs
+  const adminFeedList = document.getElementById('adminFeedList');
+  const adminSpoilersList = document.getElementById('adminSpoilersList');
+  const adminFeedSearch = document.getElementById('adminFeedSearch');
+  const adminFeedFilter = document.getElementById('adminFeedFilter');
+  const dashboardPaneTitle = document.getElementById('dashboardPaneTitle');
 
   // Contact Form
   const contactForm = document.getElementById('contactForm');
   const formStatus = document.getElementById('formStatus');
 
   // --- INITIALIZE VIEWS & UI ---
+  applySiteSettingsToPage();
   updateAdminUI();
   renderPosts();
   renderSpoilers();
@@ -147,6 +237,24 @@ document.addEventListener('DOMContentLoaded', () => {
           pane.classList.add('active');
         }
       });
+
+      // Update Dashboard Pane Title & trigger specific renders if necessary
+      const paneTitles = {
+        'paneStats': 'CHANNEL METRICS & OVERVIEW',
+        'paneAlterSite': 'SITE BRANDING CUSTOMIZER',
+        'paneManageFeed': 'MANAGE VIDEOS & UPDATES',
+        'paneManageSpoilers': 'MANAGE VIDEO TEASERS',
+        'panePublish': 'PUBLISH NEW CONTENT'
+      };
+      if (dashboardPaneTitle && paneTitles[targetPaneId]) {
+        dashboardPaneTitle.textContent = paneTitles[targetPaneId];
+      }
+
+      if (targetPaneId === 'paneManageFeed') {
+        renderAdminFeedList();
+      } else if (targetPaneId === 'paneManageSpoilers') {
+        renderAdminSpoilersList();
+      }
     });
   });
 
@@ -367,8 +475,114 @@ document.addEventListener('DOMContentLoaded', () => {
       spoilers = spoilers.filter(sp => sp.id !== id);
       localStorage.setItem('aaquif_spoilers', JSON.stringify(spoilers));
       renderSpoilers();
+      renderAdminSpoilersList(); // Update the control panel list
       showNotification("Spoiler removed.", "info");
     }
+  }
+
+  // --- RENDER ADMIN FEED CONTENT MANAGER ---
+  function renderAdminFeedList() {
+    if (!adminFeedList) return;
+    adminFeedList.innerHTML = '';
+
+    const searchQuery = (adminFeedSearch ? adminFeedSearch.value : '').toLowerCase().trim();
+    const filterTag = adminFeedFilter ? adminFeedFilter.value : 'all';
+
+    const filtered = posts.filter(post => {
+      const matchesSearch = post.title.toLowerCase().includes(searchQuery) || post.desc.toLowerCase().includes(searchQuery);
+      const matchesFilter = filterTag === 'all' || post.tag === filterTag;
+      return matchesSearch && matchesFilter;
+    });
+
+    if (filtered.length === 0) {
+      adminFeedList.innerHTML = `
+        <div style="padding: 30px; text-align: center; color: var(--text-subtle);">
+          <i class="fa-solid fa-circle-question" style="font-size: 1.8rem; margin-bottom: 10px; color: var(--color-red-glow);"></i>
+          <p>No matching feed items found.</p>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(post => {
+      const item = document.createElement('div');
+      item.className = 'admin-list-item';
+      
+      const imgHtml = post.img && post.img.trim() !== '' 
+        ? `<img src="${post.img}" class="item-thumb" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop'">`
+        : `<div class="item-fallback-icon"><i class="fa-solid fa-photo-film"></i></div>`;
+
+      item.innerHTML = `
+        <div class="item-meta-info">
+          ${imgHtml}
+          <div class="item-details">
+            <div class="item-title" title="${post.title}">${post.title}</div>
+            <div class="item-badges">
+              <span class="item-tag ${post.tag}">${post.tag}</span>
+              <span class="item-date">${post.date}</span>
+            </div>
+          </div>
+        </div>
+        <button class="item-remove-btn"><i class="fa-solid fa-trash-can"></i> Remove</button>
+      `;
+
+      const removeBtn = item.querySelector('.item-remove-btn');
+      removeBtn.addEventListener('click', () => {
+        deletePost(post.id);
+      });
+
+      adminFeedList.appendChild(item);
+    });
+  }
+
+  // --- RENDER ADMIN SPOILERS TEASERS MANAGER ---
+  function renderAdminSpoilersList() {
+    if (!adminSpoilersList) return;
+    adminSpoilersList.innerHTML = '';
+
+    if (spoilers.length === 0) {
+      adminSpoilersList.innerHTML = `
+        <div style="padding: 30px; text-align: center; color: var(--text-subtle);">
+          <i class="fa-solid fa-circle-question" style="font-size: 1.8rem; margin-bottom: 10px; color: var(--color-cyan-glow);"></i>
+          <p>No upcoming teasers found.</p>
+        </div>
+      `;
+      return;
+    }
+
+    spoilers.forEach(sp => {
+      const item = document.createElement('div');
+      item.className = 'admin-list-item';
+
+      item.innerHTML = `
+        <div class="item-meta-info">
+          <div class="item-fallback-icon"><i class="fa-solid fa-film"></i></div>
+          <div class="item-details">
+            <div class="item-title" title="${sp.title}">${sp.title}</div>
+            <div class="item-badges">
+              <span class="item-tag spoiler">Teaser</span>
+              <span class="item-date">${sp.date}</span>
+            </div>
+          </div>
+        </div>
+        <button class="item-remove-btn"><i class="fa-solid fa-trash-can"></i> Remove</button>
+      `;
+
+      const removeBtn = item.querySelector('.item-remove-btn');
+      removeBtn.addEventListener('click', () => {
+        deleteSpoiler(sp.id);
+      });
+
+      adminSpoilersList.appendChild(item);
+    });
+  }
+
+  // Bind list management search and filter events
+  if (adminFeedSearch) {
+    adminFeedSearch.addEventListener('input', renderAdminFeedList);
+  }
+  if (adminFeedFilter) {
+    adminFeedFilter.addEventListener('change', renderAdminFeedList);
   }
 
   // --- POSTS RENDER & FILTERING ---
@@ -432,22 +646,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- ADMIN PORTAL LOGIC ---
 
-  // Trigger login modal
+  // --- PREFILL BRANDING FORM INPUTS ---
+  function fillAlterSiteInputs() {
+    const settings = JSON.parse(localStorage.getItem('aaquif_site_settings')) || defaultSiteSettings;
+    const heroTitle1El = document.getElementById('siteHeroTitle1');
+    const heroTitle2El = document.getElementById('siteHeroTitle2');
+    const heroDescEl = document.getElementById('siteHeroDesc');
+    const pfpUrlEl = document.getElementById('sitePfpUrl');
+    const aboutDesc1El = document.getElementById('siteAboutDesc1');
+    const aboutDesc2El = document.getElementById('siteAboutDesc2');
+    const youtubeUrlEl = document.getElementById('siteYoutubeUrl');
+    const discordUrlEl = document.getElementById('siteDiscordUrl');
+    const gmailEl = document.getElementById('siteGmail');
+
+    if (heroTitle1El) heroTitle1El.value = settings.heroTitle1 || '';
+    if (heroTitle2El) heroTitle2El.value = settings.heroTitle2 || '';
+    if (heroDescEl) heroDescEl.value = settings.heroDesc || '';
+    if (pfpUrlEl) pfpUrlEl.value = settings.pfpUrl || '';
+    if (aboutDesc1El) aboutDesc1El.value = settings.aboutDesc1 || '';
+    if (aboutDesc2El) aboutDesc2El.value = settings.aboutDesc2 || '';
+    if (youtubeUrlEl) youtubeUrlEl.value = settings.youtubeLink || '';
+    if (discordUrlEl) discordUrlEl.value = settings.discordLink || '';
+    if (gmailEl) gmailEl.value = settings.gmailAddress || '';
+  }
+
+  // --- ADMIN PORTAL OPEN/CLOSE TRIGGERS ---
+  
+  function openCreatorDashboard() {
+    // Load current stats into inputs
+    const stats = JSON.parse(localStorage.getItem('aaquif_stats')) || defaultStats;
+    document.getElementById('statSubsInput').value = stats.subs;
+    document.getElementById('statViewsInput').value = stats.views;
+    document.getElementById('statVideosInput').value = stats.uploads;
+    document.getElementById('statDiscordInput').value = stats.discord;
+
+    fillAlterSiteInputs();
+
+    // Reset default active tab to paneStats when opening
+    tabBtns.forEach(b => b.classList.remove('active'));
+    tabPanes.forEach(p => p.classList.remove('active'));
+    
+    const defaultTab = document.querySelector('.tab-btn[data-pane="paneStats"]');
+    const defaultPane = document.getElementById('paneStats');
+    if (defaultTab && defaultPane) {
+      defaultTab.classList.add('active');
+      defaultPane.classList.add('active');
+      if (dashboardPaneTitle) dashboardPaneTitle.textContent = 'CHANNEL METRICS & OVERVIEW';
+    }
+
+    adminDashboardModal.classList.add('active');
+  }
+
+  // Trigger login modal or open dashboard
   portalTriggerBtn.addEventListener('click', () => {
     if (isAdmin) {
-      // Load current stats into inputs
-      const stats = JSON.parse(localStorage.getItem('aaquif_stats')) || defaultStats;
-      document.getElementById('statSubsInput').value = stats.subs;
-      document.getElementById('statViewsInput').value = stats.views;
-      document.getElementById('statVideosInput').value = stats.uploads;
-      document.getElementById('statDiscordInput').value = stats.discord;
-
-      adminDashboardModal.classList.add('active');
+      openCreatorDashboard();
     } else {
       loginModal.classList.add('active');
       loginPassword.focus();
     }
   });
+
+  // Banner Control button click
+  if (bannerOpenDashboardBtn) {
+    bannerOpenDashboardBtn.addEventListener('click', () => {
+      if (isAdmin) {
+        openCreatorDashboard();
+      }
+    });
+  }
 
   // Double Click avatar to bypass/login
   if (creatorPfpCard) {
@@ -457,7 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginPassword.focus();
         showNotification("Welcome back! Enter key to unlock Creator Portal.", "info");
       } else {
-        adminDashboardModal.classList.add('active');
+        openCreatorDashboard();
       }
     });
   }
@@ -504,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Automatically open dashboard
       setTimeout(() => {
-        adminDashboardModal.classList.add('active');
+        openCreatorDashboard();
       }, 500);
     } else {
       showNotification("Access denied. Incorrect key code.", "error");
@@ -536,7 +803,41 @@ document.addEventListener('DOMContentLoaded', () => {
     showNotification("Milestone statistics updated in real-time!", "success");
   });
 
-  // Form Submit 2: Upload Spoilers
+  // Form Submit 2: Alter Site Customizer
+  if (alterSiteForm) {
+    alterSiteForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const newSettings = {
+        heroTag: "OFFICIAL YOUTUBE PORTAL",
+        heroTitle1: document.getElementById('siteHeroTitle1').value.trim(),
+        heroTitle2: document.getElementById('siteHeroTitle2').value.trim(),
+        heroDesc: document.getElementById('siteHeroDesc').value.trim(),
+        aboutTitle: "THE ORIGIN", 
+        aboutSubtitle: "CREATOR PORTRAIT // REAL AAQUIF",
+        aboutDesc1: document.getElementById('siteAboutDesc1').value.trim(),
+        aboutDesc2: document.getElementById('siteAboutDesc2').value.trim(),
+        youtubeLink: document.getElementById('siteYoutubeUrl').value.trim(),
+        discordLink: document.getElementById('siteDiscordUrl').value.trim(),
+        gmailAddress: document.getElementById('siteGmail').value.trim(),
+        pfpUrl: document.getElementById('sitePfpUrl').value.trim()
+      };
+
+      // Ensure some defaults for About title/subtitle if not available
+      const currentSettings = JSON.parse(localStorage.getItem('aaquif_site_settings')) || defaultSiteSettings;
+      newSettings.aboutTitle = currentSettings.aboutTitle || defaultSiteSettings.aboutTitle;
+      newSettings.aboutSubtitle = currentSettings.aboutSubtitle || defaultSiteSettings.aboutSubtitle;
+      newSettings.heroTag = currentSettings.heroTag || defaultSiteSettings.heroTag;
+
+      localStorage.setItem('aaquif_site_settings', JSON.stringify(newSettings));
+      applySiteSettingsToPage();
+
+      adminDashboardModal.classList.remove('active');
+      showNotification("Site branding updated successfully!", "success");
+    });
+  }
+
+  // Form Submit 3: Upload Spoilers
   uploadSpoilerForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -565,13 +866,14 @@ document.addEventListener('DOMContentLoaded', () => {
     spoilers.unshift(newSpoiler);
     localStorage.setItem('aaquif_spoilers', JSON.stringify(spoilers));
     renderSpoilers();
+    renderAdminSpoilersList();
 
     adminDashboardModal.classList.remove('active');
     uploadSpoilerForm.reset();
     showNotification("Upcoming spoiler snippet published!", "success");
   });
 
-  // Form Submit 3: Create Feed Post
+  // Form Submit 4: Create Feed Post
   createPostForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -590,11 +892,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter') || 'all';
     renderPosts(activeFilter);
+    renderAdminFeedList();
 
     adminDashboardModal.classList.remove('active');
     createPostForm.reset();
     showNotification("New feed update published successfully!", "success");
   });
+
+  // --- PUBLISH TYPE SELECTOR ---
+  const btnTypeFeed = document.getElementById('btnTypeFeed');
+  const btnTypeSpoiler = document.getElementById('btnTypeSpoiler');
+  const createPostFormEl = document.getElementById('createPostForm');
+  const uploadSpoilerFormEl = document.getElementById('uploadSpoilerForm');
+
+  if (btnTypeFeed && btnTypeSpoiler) {
+    btnTypeFeed.addEventListener('click', () => {
+      btnTypeFeed.classList.add('active');
+      btnTypeSpoiler.classList.remove('active');
+      createPostFormEl.classList.add('active');
+      uploadSpoilerFormEl.classList.remove('active');
+    });
+
+    btnTypeSpoiler.addEventListener('click', () => {
+      btnTypeSpoiler.classList.add('active');
+      btnTypeFeed.classList.remove('active');
+      uploadSpoilerFormEl.classList.add('active');
+      createPostFormEl.classList.remove('active');
+    });
+  }
 
   // Delete Post
   function deletePost(id) {
@@ -605,17 +930,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter') || 'all';
       renderPosts(activeFilter);
+      renderAdminFeedList(); // Refresh admin manager list
       showNotification("Update deleted.", "info");
     }
   }
 
-  // Exit Admin Mode
+  // Exit Admin Mode (Banner)
   exitAdminBtn.addEventListener('click', () => {
     isAdmin = false;
     sessionStorage.removeItem('aaquif_admin');
     updateAdminUI();
     showNotification("Logged out from Creator Portal.", "info");
   });
+
+  // Exit Admin Mode (Sidebar)
+  if (sidebarExitBtn) {
+    sidebarExitBtn.addEventListener('click', () => {
+      isAdmin = false;
+      sessionStorage.removeItem('aaquif_admin');
+      updateAdminUI();
+      adminDashboardModal.classList.remove('active');
+      showNotification("Logged out from Creator Portal.", "info");
+    });
+  }
 
   // Update DOM depending on Admin State
   function updateAdminUI() {

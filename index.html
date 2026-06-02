@@ -20,7 +20,10 @@
 
   <!-- Admin Mode Header Banner (Appears when logged in) -->
   <div class="admin-mode-banner" id="adminBanner">
-    <span><i class="fa-solid fa-user-gear"></i> CREATOR PORTAL ACTIVE (ADMIN MODE)</span>
+    <span>
+      <i class="fa-solid fa-user-gear"></i> CREATOR PORTAL ACTIVE (ADMIN MODE)
+      <button class="open-dashboard-btn" id="bannerOpenDashboardBtn"><i class="fa-solid fa-sliders"></i> OPEN CONTROL CENTER</button>
+    </span>
     <button class="exit-admin-btn" id="exitAdminBtn">EXIT PORTAL</button>
   </div>
 
@@ -362,122 +365,237 @@
 
   <!-- Modal 2: Creator Admin Dashboard -->
   <div class="modal-overlay" id="adminDashboardModal">
-    <div class="modal-card glass-panel" style="max-width: 600px;">
-      <div class="modal-header">
-        <h3>Creator Dashboard</h3>
-        <button class="modal-close-btn" id="closeDashboardBtn">&times;</button>
-      </div>
+    <div class="dashboard-layout glass-panel" id="dashboardCard">
+      <!-- Left Sidebar Panel -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-header">
+          <div class="creator-status">
+            <span class="status-dot pulsing"></span>
+            <div class="creator-title">
+              <h4>Real Aaquif</h4>
+              <span>Creator Active</span>
+            </div>
+          </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+          <button class="tab-btn active" data-pane="paneStats"><i class="fa-solid fa-chart-simple"></i> OVERVIEW STATS</button>
+          <button class="tab-btn" data-pane="paneAlterSite"><i class="fa-solid fa-pen-to-square"></i> ALTER SITE LAYOUT</button>
+          <button class="tab-btn" data-pane="paneManageFeed"><i class="fa-solid fa-video"></i> MANAGE FEED</button>
+          <button class="tab-btn" data-pane="paneManageSpoilers"><i class="fa-solid fa-clapperboard"></i> MANAGE TEASERS</button>
+          <button class="tab-btn" data-pane="panePublish"><i class="fa-solid fa-plus-square"></i> PUBLISH CONTENT</button>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <button class="sidebar-exit-btn" id="sidebarExitBtn"><i class="fa-solid fa-right-from-bracket"></i> EXIT PORTAL</button>
+        </div>
+      </aside>
 
-      <!-- Dashboard Tab Navigation -->
-      <div class="dashboard-tabs">
-        <button class="tab-btn active" data-pane="paneStats"><i class="fa-solid fa-chart-simple"></i> STATS</button>
-        <button class="tab-btn" data-pane="paneSpoiler"><i class="fa-solid fa-film"></i> SPOILERS</button>
-        <button class="tab-btn" data-pane="paneFeed"><i class="fa-solid fa-newspaper"></i> FEED POST</button>
-      </div>
+      <!-- Right Content Area -->
+      <main class="admin-content-area">
+        <header class="content-area-header">
+          <h3 id="dashboardPaneTitle">CREATOR CONTROL CENTER</h3>
+          <button class="modal-close-btn" id="closeDashboardBtn" title="Close Panel">&times;</button>
+        </header>
 
-      <!-- Tab Panels -->
-      <!-- PANE 1: STATS -->
-      <div class="tab-pane active" id="paneStats">
-        <form id="adjustStatsForm">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="form-group">
-              <label for="statSubsInput">Subscribers Count</label>
-              <input type="number" id="statSubsInput" class="form-control" value="11700" required>
-            </div>
-            <div class="form-group">
-              <label for="statViewsInput">Total Views Count</label>
-              <input type="number" id="statViewsInput" class="form-control" value="700000" required>
-            </div>
+        <!-- Pane 1: OVERVIEW & STATS -->
+        <div class="tab-pane active" id="paneStats">
+          <div class="pane-header">
+            <h4>Channel Milestone Metrics</h4>
+            <p>Update live counters displayed in the homepage stats cards.</p>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
-            <div class="form-group">
-              <label for="statVideosInput">Uploads Count</label>
-              <input type="number" id="statVideosInput" class="form-control" value="79" required>
+          <form id="adjustStatsForm">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="statSubsInput">Subscribers Count</label>
+                <input type="number" id="statSubsInput" class="form-control" value="11700" required>
+              </div>
+              <div class="form-group">
+                <label for="statViewsInput">Total Views Count</label>
+                <input type="number" id="statViewsInput" class="form-control" value="700000" required>
+              </div>
+              <div class="form-group">
+                <label for="statVideosInput">Uploads Count</label>
+                <input type="number" id="statVideosInput" class="form-control" value="79" required>
+              </div>
+              <div class="form-group">
+                <label for="statDiscordInput">Discord Members Count</label>
+                <input type="number" id="statDiscordInput" class="form-control" value="1500" required>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="statDiscordInput">Discord Members Count</label>
-              <input type="number" id="statDiscordInput" class="form-control" value="1500" required>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 20px;">
-            SAVE METRICS <i class="fa-solid fa-floppy-disk"></i>
-          </button>
-        </form>
-      </div>
+            <button type="submit" class="btn-primary form-submit-btn">
+              SAVE METRICS <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+          </form>
+        </div>
 
-      <!-- PANE 2: SPOILERS -->
-      <div class="tab-pane" id="paneSpoiler">
-        <form id="uploadSpoilerForm">
-          <div class="form-group">
-            <label for="spoilerTitle">Spoiler Title</label>
-            <input type="text" id="spoilerTitle" class="form-control" placeholder="100 Days in Hardcore Nether..."
-              required>
+        <!-- Pane 2: ALTER SITE LAYOUT -->
+        <div class="tab-pane" id="paneAlterSite">
+          <div class="pane-header">
+            <h4>Customize Portfolio Branding</h4>
+            <p>Modify the texts, profile images, and external social media links on the fly.</p>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="form-group">
-              <label for="spoilerDate">Release Date Info</label>
-              <input type="text" id="spoilerDate" class="form-control" placeholder="Friday, June 12" required>
+          <form id="alterSiteForm">
+            <div class="form-section-divider"><span>1. HERO SECTION BRANDING</span></div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="siteHeroTitle1">Hero Title Part 1 (Regular)</label>
+                <input type="text" id="siteHeroTitle1" class="form-control" placeholder="CREATING BEYOND" required>
+              </div>
+              <div class="form-group">
+                <label for="siteHeroTitle2">Hero Title Part 2 (Glow Accent)</label>
+                <input type="text" id="siteHeroTitle2" class="form-control" placeholder="THE BLOCKS" required>
+              </div>
             </div>
             <div class="form-group">
-              <label for="spoilerYoutubeUrl">YouTube Embed/Video URL (Optional)</label>
-              <input type="url" id="spoilerYoutubeUrl" class="form-control"
-                placeholder="https://youtube.com/watch?v=...">
+              <label for="siteHeroDesc">Hero Description Subtext</label>
+              <textarea id="siteHeroDesc" class="form-control" placeholder="Enter hero subtext description..." required></textarea>
             </div>
-          </div>
-          <div class="form-group" style="margin-top: 10px;">
-            <label for="spoilerVideoFile">Upload Video snippet (Simulate local file)</label>
-            <input type="file" id="spoilerVideoFile" class="form-control" accept="video/*" style="padding: 8px;">
-          </div>
-          <div class="form-group">
-            <label for="spoilerDesc">Spoiler Description / Sneak Peek Notes</label>
-            <textarea id="spoilerDesc" class="form-control"
-              placeholder="Write a short summary of the upcoming content..." required></textarea>
-          </div>
-          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 15px;">
-            PUBLISH SNEAK PEEK <i class="fa-solid fa-share-from-square"></i>
-          </button>
-        </form>
-      </div>
 
-      <!-- PANE 3: FEED POST -->
-      <div class="tab-pane" id="paneFeed">
-        <form id="createPostForm">
-          <div class="form-group">
-            <label for="postTitle">Post Title</label>
-            <input type="text" id="postTitle" class="form-control" placeholder="Minecraft Survival Episode 100!"
-              required>
-          </div>
-          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-section-divider" style="margin-top: 25px;"><span>2. CREATOR BIO & AVATAR</span></div>
             <div class="form-group">
-              <label for="postTag">Category / Tag</label>
-              <select id="postTag" class="form-control" style="background-color: var(--bg-darkest);" required>
-                <option value="video">Video Upload</option>
-                <option value="announcement">Announcement</option>
-                <option value="milestone">Milestone Update</option>
-                <option value="media">Media / Downloads</option>
-              </select>
+              <label for="sitePfpUrl">Profile Image URL</label>
+              <input type="text" id="sitePfpUrl" class="form-control" placeholder="assets/pfp.png" required>
             </div>
             <div class="form-group">
-              <label for="postLink">Action Link URL</label>
-              <input type="url" id="postLink" class="form-control" placeholder="https://youtube.com/watch?v=...">
+              <label for="siteAboutDesc1">Biography Paragraph 1</label>
+              <textarea id="siteAboutDesc1" class="form-control" placeholder="About biography first paragraph..." required></textarea>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="postImg">Thumbnail / Cover Image URL</label>
-            <input type="text" id="postImg" class="form-control"
-              placeholder="https://images.unsplash.com/photo-... or custom path">
-          </div>
-          <div class="form-group">
-            <label for="postDesc">Post Description</label>
-            <textarea id="postDesc" class="form-control" placeholder="Tell your audience what's new..."
-              required></textarea>
-          </div>
-          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
-            PUBLISH POST <i class="fa-solid fa-share-from-square"></i>
-          </button>
-        </form>
-      </div>
+            <div class="form-group">
+              <label for="siteAboutDesc2">Biography Paragraph 2</label>
+              <textarea id="siteAboutDesc2" class="form-control" placeholder="About biography second paragraph..." required></textarea>
+            </div>
 
+            <div class="form-section-divider" style="margin-top: 25px;"><span>3. SOCIAL BUTTON INTEGRATION</span></div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="siteYoutubeUrl">YouTube Channel Link</label>
+                <input type="url" id="siteYoutubeUrl" class="form-control" placeholder="https://youtube.com/..." required>
+              </div>
+              <div class="form-group">
+                <label for="siteDiscordUrl">Discord Server Invite</label>
+                <input type="url" id="siteDiscordUrl" class="form-control" placeholder="https://discord.gg/..." required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="siteGmail">Business Inquiry Email Address</label>
+              <input type="email" id="siteGmail" class="form-control" placeholder="example@gmail.com" required>
+            </div>
+
+            <button type="submit" class="btn-primary form-submit-btn" style="margin-top: 20px;">
+              SAVE SITE LAYOUT <i class="fa-solid fa-square-check"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Pane 3: MANAGE FEED & VIDEOS -->
+        <div class="tab-pane" id="paneManageFeed">
+          <div class="pane-header">
+            <h4>Active Updates & Videos Feed</h4>
+            <p>Filter or search feed posts. Use the red buttons to remove items immediately.</p>
+          </div>
+          <div class="admin-filter-bar">
+            <input type="text" id="adminFeedSearch" class="form-control" placeholder="Search posts by title...">
+            <select id="adminFeedFilter" class="form-control" style="max-width: 180px; background-color: var(--bg-darkest);">
+              <option value="all">All Types</option>
+              <option value="video">Videos</option>
+              <option value="announcement">Announcements</option>
+              <option value="milestone">Milestones</option>
+              <option value="media">Downloads</option>
+            </select>
+          </div>
+          <div class="admin-scrollable-list" id="adminFeedList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Pane 4: MANAGE SPOILERS -->
+        <div class="tab-pane" id="paneManageSpoilers">
+          <div class="pane-header">
+            <h4>Upcoming Video Teasers & Spoilers</h4>
+            <p>Review current teasers and remove them from display instantly.</p>
+          </div>
+          <div class="admin-scrollable-list" id="adminSpoilersList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Pane 5: PUBLISH CONTENT -->
+        <div class="tab-pane" id="panePublish">
+          <div class="pane-header">
+            <h4>Publish New Update or Teaser</h4>
+            <p>Select content category type to reveal required publishing fields.</p>
+          </div>
+          
+          <div class="publish-type-selector">
+            <button type="button" class="publish-type-btn active" id="btnTypeFeed" data-type="feed"><i class="fa-solid fa-newspaper"></i> Feed Post / Video</button>
+            <button type="button" class="publish-type-btn" id="btnTypeSpoiler" data-type="spoiler"><i class="fa-solid fa-film"></i> Spoiler Teaser</button>
+          </div>
+
+          <!-- Publish Feed Form -->
+          <form id="createPostForm" class="publish-form active">
+            <div class="form-group">
+              <label for="postTitle">Post Title</label>
+              <input type="text" id="postTitle" class="form-control" placeholder="Minecraft Survival Episode 100!" required>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="postTag">Category / Tag</label>
+                <select id="postTag" class="form-control" style="background-color: var(--bg-darkest);" required>
+                  <option value="video">Video Upload</option>
+                  <option value="announcement">Announcement</option>
+                  <option value="milestone">Milestone Update</option>
+                  <option value="media">Media / Downloads</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="postLink">Action Link URL</label>
+                <input type="url" id="postLink" class="form-control" placeholder="https://youtube.com/watch?v=...">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="postImg">Thumbnail / Cover Image URL</label>
+              <input type="text" id="postImg" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+            </div>
+            <div class="form-group">
+              <label for="postDesc">Post Description</label>
+              <textarea id="postDesc" class="form-control" placeholder="Tell your audience what's new..." required></textarea>
+            </div>
+            <button type="submit" class="btn-primary form-submit-btn">
+              PUBLISH POST <i class="fa-solid fa-share-from-square"></i>
+            </button>
+          </form>
+
+          <!-- Publish Spoiler Form -->
+          <form id="uploadSpoilerForm" class="publish-form">
+            <div class="form-group">
+              <label for="spoilerTitle">Spoiler Teaser Title</label>
+              <input type="text" id="spoilerTitle" class="form-control" placeholder="100 Days in Hardcore Nether..." required>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="spoilerDate">Release Date / Info</label>
+                <input type="text" id="spoilerDate" class="form-control" placeholder="Friday, June 12" required>
+              </div>
+              <div class="form-group">
+                <label for="spoilerYoutubeUrl">YouTube Video URL (Or loop fallback)</label>
+                <input type="url" id="spoilerYoutubeUrl" class="form-control" placeholder="https://youtube.com/watch?v=...">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="spoilerVideoFile">Select video snippet (Simulated file)</label>
+              <input type="file" id="spoilerVideoFile" class="form-control" accept="video/*" style="padding: 8px;">
+            </div>
+            <div class="form-group">
+              <label for="spoilerDesc">Sneak Peek Notes / Description</label>
+              <textarea id="spoilerDesc" class="form-control" placeholder="Write a short summary of the upcoming content..." required></textarea>
+            </div>
+            <button type="submit" class="btn-primary form-submit-btn">
+              PUBLISH SNEAK PEEK <i class="fa-solid fa-share-from-square"></i>
+            </button>
+          </form>
+        </div>
+      </main>
     </div>
   </div>
 
