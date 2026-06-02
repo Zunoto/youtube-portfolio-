@@ -31,8 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
     heroDesc: "Building immersive redstone mechanisms, survival stories, and high-fidelity Minecraft experiences. Join me as we shape new adventures and push the boundaries of digital gameplay.",
     aboutTitle: "THE ORIGIN",
     aboutSubtitle: "CREATOR PORTRAIT // REAL AAQUIF",
-    aboutDesc1: "Hey! I'm Aaquif, also known online as <strong>Real Aaquif</strong>. I make entertaining, high-energy Minecraft content ranging from redstone logic tutorials to extreme survival challenges and custom map building.",
-    aboutDesc2: "My content focuses on combining technical gameplay with engaging storytelling. By building an open community and interactive projects, I seek to inspire other players to unleash their blocky creativity and code their dreams inside Minecraft.",
+    aboutDesc1: "Hey! I'm Aaquif, also known online as <strong> Real Aaquif</strong>. I create entertaining Minecraft PvP content that combines intense battles, funny moments, and engaging storytelling to keep viewers entertained from start to finish.",
+    aboutDesc2: "My videos focus on delivering high-quality content through exciting PvP experiences, unique challenges, and memorable stories within the Minecraft community. As an active and growing creator, I'm dedicated to consistently providing enjoyable content for my audience while building a strong and interactive community around my channel.",
+    aboutDesc3: "Through my content, I aim to entertain, make people laugh, and create experiences that viewers genuinely enjoy watching and sharing with others.",
     youtubeLink: "https://youtube.com/@realaaquif",
     discordLink: "https://discord.gg/AeYDnRqpxp",
     gmailAddress: "realaaquifextra@gmail.com",
@@ -83,7 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (aboutPfpEl) aboutPfpEl.src = settings.pfpUrl;
 
     const aboutDescs = document.querySelectorAll('.about-description');
-    if (aboutDescs.length >= 2) {
+    if (aboutDescs.length >= 3) {
+      aboutDescs[0].innerHTML = settings.aboutDesc1;
+      aboutDescs[1].innerHTML = settings.aboutDesc2;
+      aboutDescs[2].innerHTML = settings.aboutDesc3;
+    } else if (aboutDescs.length >= 2) {
       aboutDescs[0].innerHTML = settings.aboutDesc1;
       aboutDescs[1].innerHTML = settings.aboutDesc2;
     }
@@ -655,6 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pfpUrlEl = document.getElementById('sitePfpUrl');
     const aboutDesc1El = document.getElementById('siteAboutDesc1');
     const aboutDesc2El = document.getElementById('siteAboutDesc2');
+    const aboutDesc3El = document.getElementById('siteAboutDesc3');
     const youtubeUrlEl = document.getElementById('siteYoutubeUrl');
     const discordUrlEl = document.getElementById('siteDiscordUrl');
     const gmailEl = document.getElementById('siteGmail');
@@ -665,6 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pfpUrlEl) pfpUrlEl.value = settings.pfpUrl || '';
     if (aboutDesc1El) aboutDesc1El.value = settings.aboutDesc1 || '';
     if (aboutDesc2El) aboutDesc2El.value = settings.aboutDesc2 || '';
+    if (aboutDesc3El) aboutDesc3El.value = settings.aboutDesc3 || '';
     if (youtubeUrlEl) youtubeUrlEl.value = settings.youtubeLink || '';
     if (discordUrlEl) discordUrlEl.value = settings.discordLink || '';
     if (gmailEl) gmailEl.value = settings.gmailAddress || '';
@@ -817,6 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
         aboutSubtitle: "CREATOR PORTRAIT // REAL AAQUIF",
         aboutDesc1: document.getElementById('siteAboutDesc1').value.trim(),
         aboutDesc2: document.getElementById('siteAboutDesc2').value.trim(),
+        aboutDesc3: document.getElementById('siteAboutDesc3').value.trim(),
         youtubeLink: document.getElementById('siteYoutubeUrl').value.trim(),
         discordLink: document.getElementById('siteDiscordUrl').value.trim(),
         gmailAddress: document.getElementById('siteGmail').value.trim(),
