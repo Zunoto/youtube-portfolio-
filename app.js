@@ -25,13 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Default Site Branding Settings
   const defaultSiteSettings = {
+    settingsVersion: 2,
     heroTag: "OFFICIAL YOUTUBE PORTAL",
-    heroTitle1: "CREATING BEYOND",
-    heroTitle2: "THE BLOCKS",
-    heroDesc: "Building immersive redstone mechanisms, survival stories, and high-fidelity Minecraft experiences. Join me as we shape new adventures and push the boundaries of digital gameplay.",
+    heroTitle1: "OFFICIAL WEPSITE",
+    heroTitle2: "REALA AQUIF",
+    heroDesc: "Real Aaquif is a Minecraft YouTuber known for creating entertaining PvP, challenge, and gameplay content for the Minecraft community. This is the official website of Real Aaquif, where you can find updates, content, and everything related to the channel.",
     aboutTitle: "THE ORIGIN",
     aboutSubtitle: "CREATOR PORTRAIT // REAL AAQUIF",
-    aboutDesc1: "Hey! I'm Aaquif, also known online as <strong> Real Aaquif</strong>. I create entertaining Minecraft PvP content that combines intense battles, funny moments, and engaging storytelling to keep viewers entertained from start to finish.",
+    aboutDesc1: "Hey! I'm Aaquif, also known online as Real Aaquif. I create entertaining Minecraft PvP content that combines intense battles, funny moments, and engaging storytelling to keep viewers entertained from start to finish.",
     aboutDesc2: "My videos focus on delivering high-quality content through exciting PvP experiences, unique challenges, and memorable stories within the Minecraft community. As an active and growing creator, I'm dedicated to consistently providing enjoyable content for my audience while building a strong and interactive community around my channel.",
     aboutDesc3: "Through my content, I aim to entertain, make people laugh, and create experiences that viewers genuinely enjoy watching and sharing with others.",
     youtubeLink: "https://youtube.com/@realaaquif",
@@ -46,16 +47,28 @@ document.addEventListener('DOMContentLoaded', () => {
     siteSettings = defaultSiteSettings;
     localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
   } else {
-    // Merge any missing keys from defaults (e.g. instagramLink, aboutDesc3)
-    let needsUpdate = false;
-    for (const key in defaultSiteSettings) {
-      if (siteSettings[key] === undefined) {
-        siteSettings[key] = defaultSiteSettings[key];
-        needsUpdate = true;
-      }
-    }
-    if (needsUpdate) {
+    // If settings version is outdated, perform migration to new defaults
+    if (!siteSettings.settingsVersion || siteSettings.settingsVersion < 2) {
+      siteSettings.settingsVersion = 2;
+      siteSettings.heroTitle1 = defaultSiteSettings.heroTitle1;
+      siteSettings.heroTitle2 = defaultSiteSettings.heroTitle2;
+      siteSettings.heroDesc = defaultSiteSettings.heroDesc;
+      siteSettings.aboutDesc1 = defaultSiteSettings.aboutDesc1;
+      siteSettings.aboutDesc2 = defaultSiteSettings.aboutDesc2;
+      siteSettings.aboutDesc3 = defaultSiteSettings.aboutDesc3;
       localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
+    } else {
+      // Merge any missing keys from defaults (e.g. instagramLink, aboutDesc3)
+      let needsUpdate = false;
+      for (const key in defaultSiteSettings) {
+        if (siteSettings[key] === undefined) {
+          siteSettings[key] = defaultSiteSettings[key];
+          needsUpdate = true;
+        }
+      }
+      if (needsUpdate) {
+        localStorage.setItem('aaquif_site_settings', JSON.stringify(siteSettings));
+      }
     }
   }
 
@@ -827,6 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
 
       const newSettings = {
+        settingsVersion: 2,
         heroTag: "OFFICIAL YOUTUBE PORTAL",
         heroTitle1: document.getElementById('siteHeroTitle1').value.trim(),
         heroTitle2: document.getElementById('siteHeroTitle2').value.trim(),
