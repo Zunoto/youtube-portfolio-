@@ -480,51 +480,44 @@ section {
   scale: 1.25;
 }
 
-/* Cube Faces */
+/* Cube Faces - Styled as a dynamic Minecraft block */
 .cube-face {
   position: absolute;
   width: 160px;
   height: 160px;
-  background-color: #2b211c;
+  background-image: url('assets/redstone_block.png');
+  background-color: #961515;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   image-rendering: pixelated;
   border: 2.5px solid var(--color-red);
   box-shadow: 0 0 25px var(--color-red-glow);
-  transition: border-color 0.5s ease, box-shadow 0.5s ease;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease, background-image 0.5s ease, background-color 0.5s ease;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Custom Face Textures mapping the Minecraft Head files */
-.face-front {
-  background-image: url('assets/avatar_flat.png');
-  background-color: #f2e2de; /* Skin background fallback under transparent parts */
+/* Dynamic Block styles based on active website theme preset */
+body.theme-redstone .cube-face {
+  background-image: url('assets/redstone_block.png');
+  background-color: #961515;
 }
 
-.face-back {
-  background-image: url('assets/avatar_flat.png');
-  background-color: #2b211c; /* Hair background fallback */
+body.theme-diamond .cube-face {
+  background-image: url('assets/diamond_block.png');
+  background-color: #0ea5e9;
 }
 
-.face-left {
-  background-image: url('assets/avatar_flat.png');
-  background-color: #2b211c;
+body.theme-emerald .cube-face {
+  background-image: url('assets/emerald_block.png');
+  background-color: #10b981;
 }
 
-.face-right {
-  background-image: url('assets/avatar_flat.png');
-  background-color: #2b211c;
-}
-
-.face-top {
-  background-color: #2b211c; /* Hair top */
-}
-
-.face-bottom {
-  background-color: #501313; /* Collar red bottom */
+body.theme-gold .cube-face {
+  background-image: url('assets/gold_block.png');
+  background-color: #d97706;
 }
 
 /* Minecraft Block Texturing / Subtle grid overlay on faces */
