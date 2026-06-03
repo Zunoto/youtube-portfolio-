@@ -1331,6 +1331,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Reset Chat Session
+  function resetChatSession() {
+    chatSessionId = null;
+    chatUserName = null;
+    localStorage.removeItem('aaquif_chat_session_id');
+    localStorage.removeItem('aaquif_chat_user_name');
+    stopPollingMessages();
+    chatSetupPane.style.display = 'block';
+    chatMessagesPane.style.display = 'none';
+    chatUserNameInput.value = '';
+    if (staffAssignedTag) {
+      staffAssignedTag.textContent = 'Connecting...';
+    }
+  }
+
   // Send Message
   if (chatInputForm) {
     chatInputForm.addEventListener('submit', async (e) => {
@@ -1350,6 +1365,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response.ok) {
           const data = await response.json();
           renderChatMessages(data.chat.messages, data.chat.assignedStaffName);
+        } else if (response.status === 404) {
+          resetChatSession();
+          showNotification("Support session expired. Please start a new session.", "error");
         }
       } catch (err) {
         console.error("Message send failure:", err);
@@ -1378,6 +1396,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         const chat = await response.json();
         renderChatMessages(chat.messages, chat.assignedStaffName);
+      } else if (response.status === 404) {
+        resetChatSession();
       }
     } catch (err) {
       console.error("Messages fetch failure:", err);
