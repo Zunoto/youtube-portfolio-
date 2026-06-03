@@ -51,7 +51,7 @@
   <main>
 
     <!-- SECTION 1: HERO / HOME -->
-    <section id="home">
+    <section id="home" class="scroll-reveal reveal-fade">
       <div class="hero-content">
         <div class="hero-tag">OFFICIAL YOUTUBE PORTAL</div>
         <h1 class="hero-title">
@@ -94,7 +94,7 @@
     </section>
 
     <!-- SECTION 2: ABOUT / ORIGIN -->
-    <section id="about">
+    <section id="about" class="scroll-reveal reveal-slide-up">
       <h2 class="section-title">THE <span>ORIGIN</span></h2>
       <div class="about-container">
         <div class="about-pfp-wrapper">
@@ -142,7 +142,7 @@
     </section>
 
     <!-- SECTION 3: ACHIEVEMENTS / STATS -->
-    <section id="achievements">
+    <section id="achievements" class="scroll-reveal reveal-fade">
       <h2 class="section-title">MILESTONES & <span>STATS</span></h2>
       <div class="stats-grid">
         <!-- STAT CARD 1: SUBSCRIBERS -->
@@ -216,7 +216,7 @@
     </section>
 
     <!-- SECTION 4: MOST LATEST UPLODES -->
-    <section id="spoilers">
+    <section id="spoilers" class="scroll-reveal reveal-slide-up">
       <h2 class="section-title">MOST LATEST <span>UPLODES</span></h2>
       <div class="spoilers-container" id="spoilersContainer">
         <!-- Dynamically rendered via JS -->
@@ -224,7 +224,7 @@
     </section>
 
     <!-- SECTION 5: UPDATES / FEED -->
-    <section id="updates">
+    <section id="updates" class="scroll-reveal reveal-slide-up">
       <div class="feed-header">
         <h2 class="section-title" style="margin-bottom: 0;">LATEST <span>FEED</span></h2>
         <div class="feed-filters">
@@ -245,7 +245,7 @@
     </section>
 
     <!-- SECTION 5: CONTACT / CONNECT -->
-    <section id="contact">
+    <section id="contact" class="scroll-reveal reveal-slide-up">
       <h2 class="section-title">GET IN <span>TOUCH</span></h2>
       <div class="contact-container">
 
@@ -598,6 +598,55 @@
           </form>
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- Floating Support Chat System -->
+  <div class="support-chat-wrapper">
+    <!-- Chat Toggle Button (Floating bubble) -->
+    <button class="chat-toggle-btn" id="chatToggleBtn" title="Contact Support Staff">
+      <i class="fa-solid fa-comments"></i>
+      <span class="chat-notification-badge" id="chatNotificationBadge" style="display: none;">0</span>
+    </button>
+
+    <!-- Chat Box Window -->
+    <div class="chat-box glass-panel" id="chatBox">
+      <div class="chat-header">
+        <div class="chat-staff-info">
+          <i class="fa-solid fa-headset staff-icon-status pulsing"></i>
+          <div>
+            <h4>Support Live Chat</h4>
+            <span class="staff-assigned-tag" id="staffAssignedTag">Connecting...</span>
+          </div>
+        </div>
+        <button class="chat-close-btn" id="chatCloseBtn">&times;</button>
+      </div>
+
+      <!-- Step 1: Session Register (If name is not set) -->
+      <div class="chat-setup-pane" id="chatSetupPane">
+        <p>Please enter your name to start a secure chat session with our support team.</p>
+        <form id="chatSetupForm">
+          <div class="form-group">
+            <input type="text" id="chatUserNameInput" class="form-control" placeholder="Your Name (e.g. Steve)" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 15px; padding: 10px;">
+            Start Chat <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- Step 2: Message Thread -->
+      <div class="chat-messages-pane" id="chatMessagesPane" style="display: none;">
+        <div class="chat-messages-list" id="chatMessagesList">
+          <!-- Messages will load dynamically -->
+        </div>
+        <form class="chat-input-area" id="chatInputForm">
+          <input type="text" id="chatMessageInput" class="chat-input" placeholder="Type a message..." required autocomplete="off">
+          <button type="submit" class="chat-send-btn" id="chatSendBtn" title="Send Message">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Portal | Real Aaquif Support</title>
+  <link rel="icon" type="image/png" href="assets/pfp.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Custom Staff Portal Additions */
+    .staff-body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--bg-darkest);
+      overflow: hidden;
+    }
+
+    .staff-container {
+      width: 100%;
+      max-width: 1200px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      margin: 20px;
+      z-index: 10;
+    }
+
+    /* Login Box */
+    .login-container {
+      width: 100%;
+      max-width: 450px;
+      padding: 40px;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .login-logo {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-main);
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .login-logo span {
+      color: var(--color-red);
+      text-shadow: 0 0 10px rgba(209, 26, 42, 0.5);
+    }
+
+    /* Dashboard Layout */
+    .staff-dashboard {
+      display: none;
+      flex: 1;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .staff-info-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .staff-name-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .staff-avatar-status {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--color-red-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      border: 1px solid var(--color-red);
+    }
+
+    .staff-detail h4 {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .staff-detail span {
+      font-size: 0.75rem;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .staff-logout-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: var(--transition-fast);
+    }
+
+    .staff-logout-btn:hover {
+      color: var(--color-red-bright);
+    }
+
+    /* Chats List */
+    .chats-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-item {
+      padding: 15px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .chat-item:hover, .chat-item.active {
+      background: rgba(209, 26, 42, 0.08);
+      border-color: rgba(209, 26, 42, 0.3);
+    }
+
+    .chat-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .chat-item-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .chat-item-time {
+      font-size: 0.7rem;
+      color: var(--text-subtle);
+    }
+
+    .chat-item-snippet {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-item-assignee {
+      font-size: 0.7rem;
+      margin-top: 5px;
+      color: var(--color-cyan);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* division summary metrics */
+    .division-summary {
+      padding: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .division-summary h5 {
+      font-family: var(--font-accent);
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: var(--text-subtle);
+    }
+
+    .division-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.75rem;
+    }
+
+    .division-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+
+    .division-row .staff-load-badge {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      color: var(--color-cyan-bright);
+    }
+
+    /* Main Chat Display Pane */
+    .chat-content-pane {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .chat-no-selection {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-subtle);
+      text-align: center;
+      padding: 40px;
+    }
+
+    .chat-no-selection i {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+      color: rgba(209, 26, 42, 0.2);
+    }
+
+    .chat-header-bar {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header-bar h3 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    .chat-header-bar span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chat-messages-thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    /* Message bubbles */
+    .msg-bubble {
+      max-width: 75%;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      animation: fadeInBubble 0.25s ease-out;
+    }
+
+    @keyframes fadeInBubble {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-bubble .msg-meta {
+      font-size: 0.7rem;
+      margin-bottom: 4px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .msg-bubble .msg-time {
+      font-weight: normal;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .msg-bubble.user {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom-left-radius: 2px;
+    }
+
+    .msg-bubble.staff {
+      align-self: flex-end;
+      background: rgba(209, 26, 42, 0.15);
+      border: 1px solid rgba(209, 26, 42, 0.25);
+      border-bottom-right-radius: 2px;
+    }
+
+    .msg-bubble.system {
+      align-self: center;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      font-size: 0.8rem;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .msg-bubble.system .msg-meta {
+      color: var(--color-cyan-bright);
+      justify-content: center;
+    }
+
+    .reply-area-form {
+      padding: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .reply-input {
+      flex: 1;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      color: white;
+      padding: 12px 18px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-fast);
+    }
+
+    .reply-input:focus {
+      border-color: var(--color-red-bright);
+      box-shadow: 0 0 10px rgba(209, 26, 42, 0.2);
+    }
+
+    .reply-send-btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--color-red), #9e0f1d);
+      border: none;
+      color: white;
+      font-family: var(--font-accent);
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-fast);
+    }
+
+    .reply-send-btn:hover {
+      background: linear-gradient(90deg, var(--color-red-bright), var(--color-red));
+      transform: translateY(-1px);
+    }
+
+    /* Helpers */
+    .pulsing {
+      animation: pulseGreen 2s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+  </style>
+</head>
+<body class="staff-body">
+
+  <!-- Background Overlays -->
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-light-shafts"></div>
+
+  <!-- Staff Portal Main Container -->
+  <div class="staff-container">
+
+    <!-- 1. LOGIN INTERFACE -->
+    <div class="login-container glass-panel" id="loginWrapper">
+      <div class="login-logo">
+        <i class="fa-solid fa-cube"></i> REAL <span>STAFF</span>
+      </div>
+      <h3 style="margin-bottom: 20px; font-family: var(--font-heading); letter-spacing: 1px;">STAFF LOGIN</h3>
+      <form id="staffLoginForm">
+        <div class="form-group" style="text-align: left;">
+          <label for="staffUsername">Username</label>
+          <input type="text" id="staffUsername" class="form-control" placeholder="aaquif" required autocomplete="username">
+        </div>
+        <div class="form-group" style="text-align: left; margin-top: 15px;">
+          <label for="staffPassword">Password</label>
+          <input type="password" id="staffPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 25px; padding: 14px;">
+          Login to Dashboard <i class="fa-solid fa-right-to-bracket"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- 2. DASHBOARD INTERFACE -->
+    <div class="staff-dashboard" id="dashboardWrapper">
+      
+      <!-- Left: Chats List & load division panel -->
+      <aside class="sidebar-panel glass-panel">
+        <div class="staff-info-header">
+          <div class="staff-name-display">
+            <div class="staff-avatar-status" id="staffAvatar">A</div>
+            <div class="staff-detail">
+              <h4 id="staffNameText">Aaquif</h4>
+              <span><i class="fa-solid fa-circle pulsing" style="font-size: 8px;"></i> Online</span>
+            </div>
+          </div>
+          <button class="staff-logout-btn" id="staffLogoutBtn" title="Log Out"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+
+        <div class="chats-section" id="chatsListContainer">
+          <!-- Populated by Javascript -->
+        </div>
+
+        <div class="division-summary">
+          <h5>Chat Division (Load Share)</h5>
+          <div class="division-list" id="divisionSummaryList">
+            <!-- Dynamic staff loads -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right: Active Chat conversation details -->
+      <main class="chat-content-pane glass-panel" id="conversationPane">
+        <div class="chat-no-selection" id="noChatSelected">
+          <i class="fa-solid fa-comments"></i>
+          <h3>No Chat Selected</h3>
+          <p>Click on any incoming user support chat on the left to start responding.</p>
+        </div>
+
+        <div class="chat-conversation-container" id="activeChatContainer" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
+          <div class="chat-header-bar">
+            <div>
+              <h3 id="activeChatUser">User Name</h3>
+              <span id="activeChatAssignee">Assigned to: Aaquif</span>
+            </div>
+            <span id="activeChatSession">Session: ID</span>
+          </div>
+
+          <div class="chat-messages-thread" id="activeChatMessagesList">
+            <!-- Messages thread -->
+          </div>
+
+          <form class="reply-area-form" id="staffReplyForm">
+            <input type="text" id="staffReplyInput" class="reply-input" placeholder="Type your reply here..." required autocomplete="off">
+            <button type="submit" class="reply-send-btn">
+              Send Reply <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Toast Notification element -->
+  <div id="toastNode"></div>
+
+  <!-- Client JavaScript Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Elements
+      const loginWrapper = document.getElementById('loginWrapper');
+      const dashboardWrapper = document.getElementById('dashboardWrapper');
+      
+      const staffLoginForm = document.getElementById('staffLoginForm');
+      const staffUsername = document.getElementById('staffUsername');
+      const staffPassword = document.getElementById('staffPassword');
+      
+      const staffAvatar = document.getElementById('staffAvatar');
+      const staffNameText = document.getElementById('staffNameText');
+      const staffLogoutBtn = document.getElementById('staffLogoutBtn');
+      
+      const chatsListContainer = document.getElementById('chatsListContainer');
+      const divisionSummaryList = document.getElementById('divisionSummaryList');
+      
+      const noChatSelected = document.getElementById('noChatSelected');
+      const activeChatContainer = document.getElementById('activeChatContainer');
+      const activeChatUser = document.getElementById('activeChatUser');
+      const activeChatAssignee = document.getElementById('activeChatAssignee');
+      const activeChatSession = document.getElementById('activeChatSession');
+      const activeChatMessagesList = document.getElementById('activeChatMessagesList');
+      
+      const staffReplyForm = document.getElementById('staffReplyForm');
+      const staffReplyInput = document.getElementById('staffReplyInput');
+
+      let currentSessionId = null;
+      let pollingInterval = null;
+      let activeChatsData = [];
+
+      // Check session token
+      const staffToken = localStorage.getItem('aaquif_staff_token') || sessionStorage.getItem('aaquif_staff_token');
+      const staffName = localStorage.getItem('aaquif_staff_name') || sessionStorage.getItem('aaquif_staff_name');
+      const staffUser = localStorage.getItem('aaquif_staff_username') || sessionStorage.getItem('aaquif_staff_username');
+
+      if (staffToken) {
+        showDashboard(staffName, staffUser);
+      }
+
+      // Login trigger
+      staffLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const usernameVal = staffUsername.value.trim();
+        const passwordVal = staffPassword.value;
+
+        try {
+          const response = await fetch('/api/staff/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: usernameVal, password: passwordVal })
+          });
+          const data = await response.json();
+          if (response.ok && data.success) {
+            sessionStorage.setItem('aaquif_staff_token', data.token);
+            sessionStorage.setItem('aaquif_staff_name', data.staff.name);
+            sessionStorage.setItem('aaquif_staff_username', data.staff.username);
+            showNotification(`Welcome back, ${data.staff.name}!`, 'success');
+            showDashboard(data.staff.name, data.staff.username);
+          } else {
+            showNotification(data.error || "Access Denied. Invalid credentials.", "error");
+          }
+        } catch (err) {
+          console.error("Login failure:", err);
+          showNotification("Connection to support API failed.", "error");
+        }
+      });
+
+      // Show Dashboard View
+      function showDashboard(name, username) {
+        loginWrapper.style.display = 'none';
+        dashboardWrapper.style.display = 'grid';
+
+        // Avatar Initial
+        staffAvatar.textContent = name.charAt(0).toUpperCase();
+        staffNameText.textContent = name;
+
+        // Load data
+        loadChatsData();
+
+        // Start background polling (every 3 seconds)
+        pollingInterval = setInterval(() => {
+          loadChatsData();
+          if (currentSessionId) {
+            pollMessages();
+          }
+        }, 3000);
+      }
+
+      // Logout trigger
+      staffLogoutBtn.addEventListener('click', () => {
+        sessionStorage.clear();
+        localStorage.clear();
+        clearInterval(pollingInterval);
+        currentSessionId = null;
+        loginWrapper.style.display = 'block';
+        dashboardWrapper.style.display = 'none';
+        showNotification("Logged out from Staff Dashboard.", "info");
+      });
+
+      // Load active chats and division info
+      async function loadChatsData() {
+        const token = sessionStorage.getItem('aaquif_staff_token') || localStorage.getItem('aaquif_staff_token');
+        if (!token) return;
+
+        try {
+          const response = await fetch('/api/staff/chats', {
+            headers: { 'x-staff-token': token }
+          });
+          if (response.status === 401) {
+            // Unauthorized
+            staffLogoutBtn.click();
+            return;
+          }
+          const data = await response.json();
+          activeChatsData = data.chats || [];
+          
+          renderChatsList(activeChatsData);
+          renderDivisionSummary(activeChatsData, data.staffList || []);
+        } catch (err) {
+          console.error("Error loading chat data:", err);
+        }
+      }
+
+      // Render the chat list in sidebar
+      function renderChatsList(chats) {
+        // Keep scroll position if possible, but redraw items
+        const selectedId = currentSessionId;
+        chatsListContainer.innerHTML = '';
+
+        if (chats.length === 0) {
+          chatsListContainer.innerHTML = `
+            <div style="padding: 30px; text-align: center; color: var(--text-subtle); font-size: 0.85rem;">
+              <i class="fa-solid fa-inbox" style="font-size: 1.5rem; margin-bottom: 8px;"></i>
+              <p>No active support sessions.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Sort by updatedAt descending
+        const sortedChats = [...chats].sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+        sortedChats.forEach(chat => {
+          const item = document.createElement('div');
+          item.className = `chat-item glass-panel ${selectedId === chat.sessionId ? 'active' : ''}`;
+          
+          const lastMsg = chat.messages && chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : { text: '' };
+          const formattedTime = new Date(chat.updatedAt || chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          // Check if last message is from user (waiting for reply)
+          const isWaiting = lastMsg.sender === 'user';
+          const indicatorDot = isWaiting ? `<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-red-bright); display: inline-block;"></span>` : '';
+
+          item.innerHTML = `
+            <div class="chat-item-header">
+              <span class="chat-item-name">${chat.userName} ${indicatorDot}</span>
+              <span class="chat-item-time">${formattedTime}</span>
+            </div>
+            <div class="chat-item-snippet">${lastMsg.text || 'No messages yet.'}</div>
+            <div class="chat-item-assignee">
+              <i class="fa-solid fa-user-circle"></i> Assigned: ${chat.assignedStaffName}
+            </div>
+          `;
+
+          item.addEventListener('click', () => {
+            selectChat(chat.sessionId);
+          });
+
+          chatsListContainer.appendChild(item);
+        });
+      }
+
+      // Render Load division statistics
+      function renderDivisionSummary(chats, staffList) {
+        divisionSummaryList.innerHTML = '';
+        
+        // Count chats per staff username
+        const loadCount = {};
+        staffList.forEach(s => {
+          loadCount[s.username] = 0;
+        });
+
+        chats.forEach(chat => {
+          if (chat.assignedStaff) {
+            loadCount[chat.assignedStaff] = (loadCount[chat.assignedStaff] || 0) + 1;
+          }
+        });
+
+        staffList.forEach(staff => {
+          const count = loadCount[staff.username] || 0;
+          const row = document.createElement('div');
+          row.className = 'division-row';
+          
+          // Check if this is the logged-in user
+          const currentUser = sessionStorage.getItem('aaquif_staff_username');
+          const isMeLabel = staff.username === currentUser ? " (Me)" : "";
+
+          row.innerHTML = `
+            <span>${staff.name}${isMeLabel}</span>
+            <span class="staff-load-badge">${count} ticket${count !== 1 ? 's' : ''}</span>
+          `;
+          divisionSummaryList.appendChild(row);
+        });
+      }
+
+      // Select chat
+      function selectChat(sessionId) {
+        currentSessionId = sessionId;
+        noChatSelected.style.display = 'none';
+        activeChatContainer.style.display = 'flex';
+
+        // Set active item styling
+        const items = document.querySelectorAll('.chat-item');
+        items.forEach(it => it.classList.remove('active'));
+        
+        // Load messages immediately
+        const chat = activeChatsData.find(c => c.sessionId === sessionId);
+        if (chat) {
+          activeChatUser.textContent = chat.userName;
+          activeChatAssignee.textContent = `Assigned Staff: ${chat.assignedStaffName}`;
+          activeChatSession.textContent = `Session: ${chat.sessionId.substring(5, 13)}...`;
+          
+          renderMessages(chat.messages);
+          scrollToBottom();
+        }
+
+        // Focus reply input
+        staffReplyInput.focus();
+      }
+
+      // Poll messages specifically for active chat
+      async function pollMessages() {
+        if (!currentSessionId) return;
+        try {
+          const response = await fetch(`/api/chat/messages?sessionId=${currentSessionId}`);
+          if (!response.ok) return;
+          const chat = await response.json();
+          
+          // Check if message count changed or text of last message changed before rendering to prevent scroll bounce
+          const currentCount = activeChatMessagesList.children.length;
+          if (chat.messages && chat.messages.length !== currentCount) {
+            renderMessages(chat.messages);
+            scrollToBottom();
+          }
+        } catch (err) {
+          console.error("Error polling chat messages:", err);
+        }
+      }
+
+      // Render message thread
+      function renderMessages(messages) {
+        activeChatMessagesList.innerHTML = '';
+        messages.forEach(msg => {
+          const bubble = document.createElement('div');
+          bubble.className = `msg-bubble ${msg.sender}`;
+          
+          const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const roleLabel = msg.sender === 'staff' ? 'Staff Reply' : (msg.sender === 'system' ? 'System Notice' : 'Visitor');
+
+          bubble.innerHTML = `
+            <div class="msg-meta">
+              <span>${msg.senderName} (${roleLabel})</span>
+              <span class="msg-time">${time}</span>
+            </div>
+            <div>${msg.text}</div>
+          `;
+          activeChatMessagesList.appendChild(bubble);
+        });
+      }
+
+      // Scroll thread to bottom
+      function scrollToBottom() {
+        activeChatMessagesList.scrollTop = activeChatMessagesList.scrollHeight;
+      }
+
+      // Reply submit handler
+      staffReplyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = staffReplyInput.value.trim();
+        const sessionId = currentSessionId;
+        const token = sessionStorage.getItem('aaquif_staff_token') || localStorage.getItem('aaquif_staff_token');
+
+        if (!text || !sessionId || !token) return;
+
+        // Clear input early for snappy UI feel
+        staffReplyInput.value = '';
+
+        try {
+          const response = await fetch('/api/staff/reply', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-staff-token': token
+            },
+            body: JSON.stringify({ sessionId, text })
+          });
+          const data = await response.json();
+          if (response.ok && data.success) {
+            // Append message locally for instant feed
+            pollMessages();
+            loadChatsData();
+          } else {
+            showNotification(data.error || "Failed to send message.", "error");
+          }
+        } catch (err) {
+          console.error("Reply send error:", err);
+          showNotification("Network error. Please try again.", "error");
+        }
+      });
+
+      // Notification helper
+      function showNotification(msg, type = 'info') {
+        const toast = document.createElement('div');
+        toast.style.position = 'fixed';
+        toast.style.bottom = '30px';
+        toast.style.right = '30px';
+        toast.style.padding = '15px 25px';
+        toast.style.borderRadius = '8px';
+        toast.style.color = 'white';
+        toast.style.fontFamily = 'var(--font-body)';
+        toast.style.fontSize = '0.85rem';
+        toast.style.fontWeight = '500';
+        toast.style.zIndex = '9999';
+        toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+        toast.style.display = 'flex';
+        toast.style.alignItems = 'center';
+        toast.style.gap = '10px';
+        toast.style.transition = 'all 0.3s ease';
+        toast.style.transform = 'translateY(20px)';
+        toast.style.opacity = '0';
+        toast.style.backdropFilter = 'blur(10px)';
+
+        let icon = '<i class="fa-solid fa-circle-info"></i>';
+        if (type === 'success') {
+          toast.style.background = 'rgba(46, 117, 89, 0.9)';
+          toast.style.border = '1px solid #10b981';
+          icon = '<i class="fa-solid fa-circle-check"></i>';
+        } else if (type === 'error') {
+          toast.style.background = 'rgba(163, 31, 46, 0.9)';
+          toast.style.border = '1px solid #ef4444';
+          icon = '<i class="fa-solid fa-circle-exclamation"></i>';
+        } else {
+          toast.style.background = 'rgba(22, 8, 11, 0.95)';
+          toast.style.border = '1px solid rgba(255,255,255,0.1)';
+        }
+
+        toast.innerHTML = `${icon} ${msg}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.transform = 'translateY(0)';
+          toast.style.opacity = '1';
+        }, 50);
+
+        setTimeout(() => {
+          toast.style.transform = 'translateY(20px)';
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+    });
+  </script>
+</body>
+</html>

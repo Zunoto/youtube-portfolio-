@@ -8,6 +8,12 @@ const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'database.json');
 const ADMIN_PASSWORD = 'Sexwithrealaaquif';
 
+const DEFAULT_STAFF = [
+  { username: 'aaquif', password: 'aaquifpassword', name: 'Aaquif' },
+  { username: 'steve', password: 'steve123', name: 'Staff Steve' },
+  { username: 'alex', password: 'alex123', name: 'Staff Alex' }
+];
+
 app.use(cors());
 app.use(express.json());
 
@@ -88,14 +94,28 @@ const defaultDbData = {
 function readDb() {
   try {
     if (!fs.existsSync(DB_FILE)) {
-      writeDb(defaultDbData);
-      return defaultDbData;
+      const initialDb = { ...defaultDbData, staff: DEFAULT_STAFF, chats: [] };
+      writeDb(initialDb);
+      return initialDb;
     }
     const data = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(data);
+    const db = JSON.parse(data);
+    let updated = false;
+    if (!db.staff) {
+      db.staff = DEFAULT_STAFF;
+      updated = true;
+    }
+    if (!db.chats) {
+      db.chats = [];
+      updated = true;
+    }
+    if (updated) {
+      writeDb(db);
+    }
+    return db;
   } catch (err) {
     console.error("Error reading database file, returning default data:", err);
-    return defaultDbData;
+    return { ...defaultDbData, staff: DEFAULT_STAFF, chats: [] };
   }
 }
 
@@ -106,6 +126,33 @@ function writeDb(data) {
   } catch (err) {
     console.error("Error writing database file:", err);
     return false;
+  }
+}
+
+// 10-Day Chat Cleanup Helper
+function cleanExpiredChats() {
+  try {
+    const db = readDb();
+    const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000;
+    let updated = false;
+
+    if (db.chats && db.chats.length > 0) {
+      const initialCount = db.chats.length;
+      db.chats = db.chats.filter(chat => {
+        const timeToCheck = chat.updatedAt || chat.createdAt || Date.now();
+        return timeToCheck > tenDaysAgo;
+      });
+      if (db.chats.length !== initialCount) {
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      writeDb(db);
+      console.log(`[Cleanup] Purged expired support chats (older than 10 days).`);
+    }
+  } catch (err) {
+    console.error("Error during expired chat cleanup:", err);
   }
 }
 
@@ -151,6 +198,174 @@ app.post('/api/save', requireAdmin, (req, res) => {
   }
 });
 
+// --- SUPPORT CHAT API ENDPOINTS ---
+
+// Start a new chat session for user
+app.post('/api/chat/start', (req, res) => {
+  cleanExpiredChats();
+  const db = readDb();
+  const { name } = req.body;
+  let { sessionId } = req.body;
+
+  if (sessionId) {
+    const existingChat = db.chats.find(c => c.sessionId === sessionId);
+    if (existingChat) {
+      return res.json(existingChat);
+    }
+  }
+
+  // Create new session
+  sessionId = sessionId || 'sess_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+  const userName = name || 'Visitor';
+
+  // Proper division of chats (load balancing / round robin)
+  const staffList = db.staff && db.staff.length > 0 ? db.staff : DEFAULT_STAFF;
+  
+  // Calculate assigned staff based on round-robin assignment of active chats count
+  const activeChatsCount = db.chats.length;
+  const assignedStaff = staffList[activeChatsCount % staffList.length];
+
+  const newChat = {
+    sessionId: sessionId,
+    userName: userName,
+    assignedStaff: assignedStaff.username,
+    assignedStaffName: assignedStaff.name,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    messages: [
+      {
+        id: 'msg_init',
+        sender: 'system',
+        senderName: 'System',
+        text: `Hello ${userName}! Welcome to Real Aaquif Support. ${assignedStaff.name} has been assigned to your ticket. How can we help you today?`,
+        timestamp: Date.now()
+      }
+    ]
+  };
+
+  db.chats.push(newChat);
+  writeDb(db);
+  res.json(newChat);
+});
+
+// Retrieve messages of a specific session
+app.get('/api/chat/messages', (req, res) => {
+  cleanExpiredChats();
+  const { sessionId } = req.query;
+  if (!sessionId) {
+    return res.status(400).json({ error: "Missing sessionId parameter." });
+  }
+  const db = readDb();
+  const chat = db.chats.find(c => c.sessionId === sessionId);
+  if (!chat) {
+    return res.status(404).json({ error: "Chat session not found." });
+  }
+  res.json(chat);
+});
+
+// User sends a message
+app.post('/api/chat/send', (req, res) => {
+  cleanExpiredChats();
+  const { sessionId, text } = req.body;
+  if (!sessionId || !text) {
+    return res.status(400).json({ error: "Missing sessionId or text." });
+  }
+  const db = readDb();
+  const chat = db.chats.find(c => c.sessionId === sessionId);
+  if (!chat) {
+    return res.status(404).json({ error: "Chat session not found." });
+  }
+
+  const newMessage = {
+    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+    sender: 'user',
+    senderName: chat.userName,
+    text: text,
+    timestamp: Date.now()
+  };
+
+  chat.messages.push(newMessage);
+  chat.updatedAt = Date.now();
+  writeDb(db);
+  res.json({ success: true, message: newMessage, chat: chat });
+});
+
+// Staff Authentication Login
+app.post('/api/staff/login', (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: "Missing username or password." });
+  }
+  const db = readDb();
+  const staff = db.staff.find(s => s.username.toLowerCase() === username.toLowerCase() && s.password === password);
+  
+  if (staff) {
+    res.json({
+      success: true,
+      token: 'staff_token_' + staff.username,
+      staff: { username: staff.username, name: staff.name }
+    });
+  } else {
+    res.status(401).json({ success: false, error: "Invalid username or password." });
+  }
+});
+
+// Retrieve all chats for logged in staff
+app.get('/api/staff/chats', (req, res) => {
+  cleanExpiredChats();
+  const token = req.headers['x-staff-token'] || req.query.token;
+  if (!token || !token.startsWith('staff_token_')) {
+    return res.status(401).json({ error: "Unauthorized: Invalid or missing staff token." });
+  }
+  const db = readDb();
+  res.json({
+    chats: db.chats,
+    staffList: db.staff.map(s => ({ username: s.username, name: s.name }))
+  });
+});
+
+// Staff sends reply
+app.post('/api/staff/reply', (req, res) => {
+  cleanExpiredChats();
+  const token = req.headers['x-staff-token'] || req.body.token;
+  if (!token || !token.startsWith('staff_token_')) {
+    return res.status(401).json({ error: "Unauthorized staff action." });
+  }
+  const staffUsername = token.substring('staff_token_'.length);
+  const { sessionId, text } = req.body;
+  if (!sessionId || !text) {
+    return res.status(400).json({ error: "Missing sessionId or reply text." });
+  }
+
+  const db = readDb();
+  const staffUser = db.staff.find(s => s.username === staffUsername);
+  if (!staffUser) {
+    return res.status(401).json({ error: "Staff member not found." });
+  }
+  const chat = db.chats.find(c => c.sessionId === sessionId);
+  if (!chat) {
+    return res.status(404).json({ error: "Chat session not found." });
+  }
+
+  const newMessage = {
+    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+    sender: 'staff',
+    senderName: staffUser.name,
+    text: text,
+    timestamp: Date.now()
+  };
+
+  chat.messages.push(newMessage);
+  chat.updatedAt = Date.now();
+  writeDb(db);
+  res.json({ success: true, message: newMessage, chat: chat });
+});
+
+// Serve staff portal page
+app.get('/staff', (req, res) => {
+  res.sendFile(path.join(__dirname, 'staff.html'));
+});
+
 // Securely serve specific static assets
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
@@ -161,7 +376,8 @@ app.get('/style.css', (req, res) => res.sendFile(path.join(__dirname, 'style.css
 app.get('*', (req, res) => res.redirect('/'));
 
 // Initialize database on startup
-readDb();
+const initialDb = readDb();
+cleanExpiredChats();
 
 app.listen(PORT, () => {
   console.log(`==================================================`);

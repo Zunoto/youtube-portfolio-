@@ -1205,4 +1205,234 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4000);
   }
 
+  // --- SCROLL REVEAL OBSERVER ---
+  const revealElements = document.querySelectorAll('.scroll-reveal');
+  const revealObserverOptions = {
+    root: null,
+    threshold: 0.1,
+    rootMargin: '0px 0px -60px 0px'
+  };
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+      } else {
+        entry.target.classList.remove('revealed');
+      }
+    });
+  }, revealObserverOptions);
+
+  revealElements.forEach(el => revealObserver.observe(el));
+
+  // --- SHIFT + B SHORTCUT TO OPEN STAFF PANEL ---
+  document.addEventListener('keydown', (e) => {
+    if (e.shiftKey && (e.key === 'B' || e.key === 'b')) {
+      const activeEl = document.activeElement;
+      const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable);
+
+      if (!isInput) {
+        e.preventDefault();
+        window.open('/staff', '_blank');
+        showNotification("Opening Staff Support Portal...", "success");
+      }
+    }
+  });
+
+  // --- USER SUPPORT CHAT WIDGET LOGIC ---
+  const chatToggleBtn = document.getElementById('chatToggleBtn');
+  const chatBox = document.getElementById('chatBox');
+  const chatCloseBtn = document.getElementById('chatCloseBtn');
+  const chatSetupPane = document.getElementById('chatSetupPane');
+  const chatSetupForm = document.getElementById('chatSetupForm');
+  const chatUserNameInput = document.getElementById('chatUserNameInput');
+  const chatMessagesPane = document.getElementById('chatMessagesPane');
+  const chatMessagesList = document.getElementById('chatMessagesList');
+  const chatInputForm = document.getElementById('chatInputForm');
+  const chatMessageInput = document.getElementById('chatMessageInput');
+  const staffAssignedTag = document.getElementById('staffAssignedTag');
+  const chatNotificationBadge = document.getElementById('chatNotificationBadge');
+
+  let chatSessionId = localStorage.getItem('aaquif_chat_session_id');
+  let chatUserName = localStorage.getItem('aaquif_chat_user_name');
+  let chatPollInterval = null;
+  let unreadCount = 0;
+  let lastMessageCount = 0;
+
+  // Toggle Chat Box
+  if (chatToggleBtn && chatBox) {
+    chatToggleBtn.addEventListener('click', () => {
+      const isActive = chatBox.classList.toggle('active');
+      if (isActive) {
+        chatBox.style.display = 'flex';
+        // Clear badge
+        unreadCount = 0;
+        chatNotificationBadge.style.display = 'none';
+        chatNotificationBadge.textContent = '0';
+        
+        // Setup or Load
+        if (chatSessionId && chatUserName) {
+          chatSetupPane.style.display = 'none';
+          chatMessagesPane.style.display = 'flex';
+          loadChatMessages();
+          startPollingMessages();
+        } else {
+          chatSetupPane.style.display = 'block';
+          chatMessagesPane.style.display = 'none';
+          chatUserNameInput.focus();
+        }
+      } else {
+        chatBox.style.display = 'none';
+        stopPollingMessages();
+      }
+    });
+  }
+
+  if (chatCloseBtn && chatBox) {
+    chatCloseBtn.addEventListener('click', () => {
+      chatBox.classList.remove('active');
+      chatBox.style.display = 'none';
+      stopPollingMessages();
+    });
+  }
+
+  // Register Session
+  if (chatSetupForm) {
+    chatSetupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = chatUserNameInput.value.trim();
+      if (!name) return;
+
+      try {
+        const response = await fetch('/api/chat/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name })
+        });
+        if (response.ok) {
+          const chat = await response.json();
+          chatSessionId = chat.sessionId;
+          chatUserName = chat.userName;
+          localStorage.setItem('aaquif_chat_session_id', chatSessionId);
+          localStorage.setItem('aaquif_chat_user_name', chatUserName);
+
+          chatSetupPane.style.display = 'none';
+          chatMessagesPane.style.display = 'flex';
+          
+          renderChatMessages(chat.messages, chat.assignedStaffName);
+          startPollingMessages();
+        } else {
+          showNotification("Could not start support session.", "error");
+        }
+      } catch (err) {
+        console.error("Chat register error:", err);
+        showNotification("Support server offline.", "error");
+      }
+    });
+  }
+
+  // Send Message
+  if (chatInputForm) {
+    chatInputForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = chatMessageInput.value.trim();
+      if (!text || !chatSessionId) return;
+
+      // Clear input immediately
+      chatMessageInput.value = '';
+
+      try {
+        const response = await fetch('/api/chat/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: chatSessionId, text: text })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          renderChatMessages(data.chat.messages, data.chat.assignedStaffName);
+        }
+      } catch (err) {
+        console.error("Message send failure:", err);
+      }
+    });
+  }
+
+  // Start / Stop Polling
+  function startPollingMessages() {
+    stopPollingMessages(); // ensure no double intervals
+    chatPollInterval = setInterval(loadChatMessages, 3000);
+  }
+
+  function stopPollingMessages() {
+    if (chatPollInterval) {
+      clearInterval(chatPollInterval);
+      chatPollInterval = null;
+    }
+  }
+
+  // Load Messages
+  async function loadChatMessages() {
+    if (!chatSessionId) return;
+    try {
+      const response = await fetch(`/api/chat/messages?sessionId=${chatSessionId}`);
+      if (response.ok) {
+        const chat = await response.json();
+        renderChatMessages(chat.messages, chat.assignedStaffName);
+      }
+    } catch (err) {
+      console.error("Messages fetch failure:", err);
+    }
+  }
+
+  // Render Messages
+  function renderChatMessages(messages, staffName) {
+    if (staffAssignedTag) {
+      staffAssignedTag.textContent = staffName ? `Assigned Staff: ${staffName}` : 'Connecting...';
+    }
+
+    const isScrolledToBottom = chatMessagesList.scrollHeight - chatMessagesList.clientHeight <= chatMessagesList.scrollTop + 60;
+
+    // Increment notification badge if chat window is closed and message count increased
+    if (messages.length > lastMessageCount) {
+      if (lastMessageCount > 0 && chatBox.style.display !== 'flex') {
+        const latestMsg = messages[messages.length - 1];
+        if (latestMsg.sender !== 'user') {
+          unreadCount += (messages.length - lastMessageCount);
+          chatNotificationBadge.textContent = unreadCount;
+          chatNotificationBadge.style.display = 'flex';
+          showNotification(`Support Reply: "${latestMsg.text.substring(0, 25)}..."`, "info");
+        }
+      }
+      lastMessageCount = messages.length;
+    }
+
+    chatMessagesList.innerHTML = '';
+    messages.forEach(msg => {
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble-msg ${msg.sender}`;
+      
+      const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      bubble.innerHTML = `
+        <div class="chat-bubble-meta">
+          <span class="chat-bubble-sender">${msg.senderName}</span>
+          <span class="chat-bubble-time">${time}</span>
+        </div>
+        <div class="chat-bubble-text">${msg.text}</div>
+      `;
+      chatMessagesList.appendChild(bubble);
+    });
+
+    if (isScrolledToBottom || chatMessagesList.children.length <= 2) {
+      chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
+    }
+  }
+
+  // Poll in background even if closed just to check for new staff responses
+  setInterval(() => {
+    if (chatSessionId && chatBox.style.display !== 'flex') {
+      loadChatMessages();
+    }
+  }, 5000);
+
 });
