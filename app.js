@@ -1253,6 +1253,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const staffAssignedTag = document.getElementById('staffAssignedTag');
   const chatNotificationBadge = document.getElementById('chatNotificationBadge');
 
+  const isLocalFile = window.location.protocol === 'file:';
   let chatSessionId = localStorage.getItem('aaquif_chat_session_id');
   let chatUserName = localStorage.getItem('aaquif_chat_user_name');
   let chatPollInterval = null;
@@ -1269,6 +1270,24 @@ document.addEventListener('DOMContentLoaded', () => {
         unreadCount = 0;
         chatNotificationBadge.style.display = 'none';
         chatNotificationBadge.textContent = '0';
+        
+        if (isLocalFile) {
+          chatSetupPane.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+              <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; margin-bottom: 15px; color: var(--color-red-bright);"></i>
+              <h4 style="margin-bottom: 10px; font-family: var(--font-heading); color: white;">Local File Detected</h4>
+              <p style="font-size: 0.82rem; line-height: 1.4; color: var(--text-muted);">
+                Support chat APIs are disabled when opening index.html directly via the <strong>file://</strong> protocol.
+              </p>
+              <p style="font-size: 0.82rem; line-height: 1.4; margin-top: 10px; color: var(--color-cyan-bright);">
+                Please run the server using <code>npm start</code> and access the site at <code>http://localhost:3000</code>.
+              </p>
+            </div>
+          `;
+          chatSetupPane.style.display = 'block';
+          chatMessagesPane.style.display = 'none';
+          return;
+        }
         
         // Setup or Load
         if (chatSessionId && chatUserName) {

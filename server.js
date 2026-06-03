@@ -140,16 +140,18 @@ function cleanExpiredChats() {
       const initialCount = db.chats.length;
       db.chats = db.chats.filter(chat => {
         const timeToCheck = chat.updatedAt || chat.createdAt || Date.now();
-        return timeToCheck > tenDaysAgo;
+        const keep = timeToCheck > tenDaysAgo;
+        console.log(`[Cleanup Check] Chat ID: ${chat.sessionId}, Time: ${timeToCheck}, Limit: ${tenDaysAgo}, Keep: ${keep}`);
+        return keep;
       });
       if (db.chats.length !== initialCount) {
         updated = true;
+        console.log(`[Cleanup] Purged ${initialCount - db.chats.length} expired chats.`);
       }
     }
 
     if (updated) {
       writeDb(db);
-      console.log(`[Cleanup] Purged expired support chats (older than 10 days).`);
     }
   } catch (err) {
     console.error("Error during expired chat cleanup:", err);
@@ -256,8 +258,10 @@ app.get('/api/chat/messages', (req, res) => {
     return res.status(400).json({ error: "Missing sessionId parameter." });
   }
   const db = readDb();
+  console.log(`[Messages API Debug] Request for sessionId: "${sessionId}". Active DB sessions:`, db.chats.map(c => c.sessionId));
   const chat = db.chats.find(c => c.sessionId === sessionId);
   if (!chat) {
+    console.log(`[Messages API Debug] Chat session NOT found for: "${sessionId}"`);
     return res.status(404).json({ error: "Chat session not found." });
   }
   res.json(chat);
